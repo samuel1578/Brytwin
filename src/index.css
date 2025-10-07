@@ -1,6 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Hurricane&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500&display=swap');
+
+
+/* Tailwind directives (processed by PostCSS/Tailwind) */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* Dark mode base styles */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --primary: 346.8 77.2% 49.8%;
+    --primary-foreground: 355.7 100% 97.3%;
+  }
+  
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --primary: 346.8 77.2% 49.8%;
+    --primary-foreground: 355.7 100% 97.3%;
+  }
+}
 
 /* Glass effect utility */
 .glass {
@@ -9,4 +32,364 @@
   -webkit-backdrop-filter: blur(7px);
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+}
+
+/* Hurricane font utility class */
+.font-hurricane {
+  font-family: 'Hurricane', cursive;
+  font-display: swap;
+}
+
+/* IBM Plex Serif font utility class */
+.font-ibm-plex {
+  font-family: 'IBM Plex Serif', serif;
+  font-display: swap;
+}
+
+/* Responsive Hero Background Images */
+.hero-bg {
+  /* Mobile background - current image that looks great on mobile */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                    url('https://images.pexels.com/photos/8487390/pexels-photo-8487390.jpeg?auto=compress&cs=tinysrgb&w=800');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 1s ease-in-out;
+}
+
+/* Mobile hero2 background for scroll-based switching */
+@media (max-width: 767px) {
+  .hero-bg.mobile-hero-2 {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                      var(--mobile-hero-2);
+  }
+}
+
+/* Desktop slideshow backgrounds */
+@media (min-width: 768px) {
+  .hero-bg {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                      url('https://images.pexels.com/photos/14875937/pexels-photo-14875937.jpeg?auto=compress&cs=tinysrgb&w=1920');
+    background-position: center center;
+    background-size: cover;
+  }
+  
+  /* Second slide for desktop slideshow */
+  .hero-bg.slide-2 {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                      url('https://images.pexels.com/photos/16368372/pexels-photo-16368372.jpeg?auto=compress&cs=tinysrgb&w=1920');
+  }
+}
+
+/* Large desktop optimization */
+@media (min-width: 1200px) {
+  .hero-bg {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                      url('https://images.pexels.com/photos/14875937/pexels-photo-14875937.jpeg?auto=compress&cs=tinysrgb&w=2000');
+  }
+  
+  /* Second slide for large desktop */
+  .hero-bg.slide-2 {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                      url('https://images.pexels.com/photos/16368372/pexels-photo-16368372.jpeg?auto=compress&cs=tinysrgb&w=2000');
+  }
+}
+
+/* SERVICES SECTION - simplified */
+.services-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+/* Service card styling */
+.service-card {
+  width: 100%;
+  min-height: 350px;
+  height: auto;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Hover effect for cards */
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark mode support */
+.dark .service-card {
+  background-color: rgba(30, 41, 59, 0.95);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.dark .service-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+  .service-card {
+    min-height: 300px;
+    padding: 1.5rem;
+  }
+}
+
+/* Tablet and larger adjustments */
+@media (min-width: 768px) {
+  .services-container {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2.5rem;
+  }
+  
+  .service-card {
+    min-height: 400px;
+    padding: 2.5rem;
+  }
+}
+
+/* Large screen optimization */
+@media (min-width: 1200px) {
+  .services-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+  }
+}
+
+/* ===== SCROLL ANIMATIONS ===== */
+
+/* Base animation states */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-on-scroll.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fade In Animation */
+.fade-in {
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.fade-in.in-view {
+  opacity: 1;
+}
+
+/* Slide Up Animation */
+.slide-up {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-up.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Slide Left Animation */
+.slide-left {
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-left.in-view {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Slide Right Animation */
+.slide-right {
+  opacity: 0;
+  transform: translateX(50px);
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-right.in-view {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Scale Animation */
+.scale-in {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scale-in.in-view {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Stagger Animation for Lists */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stagger-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Navigation Scroll Effects */
+.nav-scroll-bg {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.dark .nav-scroll-bg {
+  background: rgba(17, 24, 39, 0.95);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced hover effects for WordPress feel */
+.wordpress-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wordpress-card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.dark .wordpress-card-hover:hover {
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* Floating animation for icons */
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Pulse animation for call-to-action buttons */
+.pulse-on-hover {
+  transition: all 0.3s ease;
+}
+
+.pulse-on-hover:hover {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Hide scrollbar for mobile services */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.stagger-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Navigation Scroll Effects */
+.nav-scroll-bg {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.dark .nav-scroll-bg {
+  background: rgba(17, 24, 39, 0.95);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced hover effects for WordPress feel */
+.wordpress-card-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wordpress-card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.dark .wordpress-card-hover:hover {
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* Floating animation for icons */
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Pulse animation for call-to-action buttons */
+.pulse-on-hover {
+  transition: all 0.3s ease;
+}
+
+.pulse-on-hover:hover {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }

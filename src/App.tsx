@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Menu, 
   X, 
@@ -15,17 +15,149 @@ import {
   Truck,
   Globe,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   Facebook,
   Twitter,
   Instagram,
   Linkedin
 } from 'lucide-react';
 import logo from './logo.jpeg';
+import hero2Img from './hero2.jpg';
+import estateImg from './estate.jpg';
+import constructionImg from './construction.jpg';
+import goodsImg from './goods.jpg';
+import handshakeImg from './handshake.jpg';
+import { ThemeToggle } from './components/ThemeToggle';
+import { useInView, useStaggeredInView } from './hooks/useInView';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [heroSlide, setHeroSlide] = useState(1);
+  const [isPaused, setIsPaused] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+  const [mobileHeroImage, setMobileHeroImage] = useState(1); // 1 for default, 2 for hero2
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
+
+  // Animation hooks
+  const aboutTitleRef = useInView<HTMLHeadingElement>({ threshold: 0.3 });
+  const aboutDescRef = useInView<HTMLParagraphElement>({ threshold: 0.2 });
+  const aboutButtonRef = useInView<HTMLButtonElement>({ threshold: 0.5 });
+  
+  const contactSectionRef = useStaggeredInView<HTMLDivElement>(4, 100);
+  const testimonialsRef = useInView<HTMLHeadingElement>({ threshold: 0.3 });
+  
+  // Navigation scroll state
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  // Navigate to next service
+  const nextService = () => {
+    const swiper = document.getElementById('servicesSwiper');
+    if (swiper) swiper.scrollBy({ left: 320, behavior: 'smooth' });
+  };
+
+  // Navigate to previous service
+  const prevService = () => {
+    const swiper = document.getElementById('servicesSwiper');
+    if (swiper) swiper.scrollBy({ left: -320, behavior: 'smooth' });
+  };
+
+  // No longer needed with the new swiper design
+
+  // Touch handlers for mobile swipe - handled natively by the scrollable container
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(0);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    // We'll let the native scroll handle most of the swiping
+    // This is just for additional swipe detection if needed
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 100;
+    const isRightSwipe = distance < -100;
+
+    if (isLeftSwipe) nextService();
+    if (isRightSwipe) prevService();
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') prevService();
+      if (e.key === 'ArrowRight') nextService();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Hero slideshow effect for desktop only
+  useEffect(() => {
+    if (isPaused) return;
+    
+    const interval = setInterval(() => {
+      setHeroSlide(prev => prev === 1 ? 2 : 1);
+    }, 6000); // Switch every 6 seconds
+
+    return () => clearInterval(interval);
+  }, [isPaused]);
+
+  // Mobile hero scroll-based image switching and navigation background
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Navigation background change
+      if (currentScrollY > 100 && !isScrolled) {
+        setIsScrolled(true);
+      } else if (currentScrollY <= 100 && isScrolled) {
+        setIsScrolled(false);
+      }
+      
+      // Mobile hero switching (only apply on mobile devices)
+      if (window.innerWidth >= 768) return;
+      
+      const heroSection = document.getElementById('home');
+      
+      if (!heroSection) return;
+      
+      const heroHeight = heroSection.offsetHeight;
+      const heroBottom = heroSection.offsetTop + heroHeight;
+      
+      // Check if user has scrolled past the hero section
+      if (currentScrollY > heroBottom && !hasScrolledPastHero) {
+        setHasScrolledPastHero(true);
+      }
+      
+      // If user is back in hero area and has previously scrolled past it
+      if (currentScrollY <= heroBottom && hasScrolledPastHero) {
+        const isScrollingUp = currentScrollY < lastScrollY;
+        const isScrollingDown = currentScrollY > lastScrollY;
+        
+        // Switch hero image based on scroll direction
+        if (isScrollingUp && mobileHeroImage !== 2) {
+          setMobileHeroImage(2);
+        } else if (isScrollingDown && mobileHeroImage !== 1) {
+          setMobileHeroImage(1);
+        }
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY, hasScrolledPastHero, mobileHeroImage, isScrolled]);
 
   const services = [
     {
@@ -33,28 +165,28 @@ function App() {
       title: "Estate Management & Sales",
       description: "Professional property management and sales services for luxury residential and commercial properties.",
       color: "bg-emerald-600",
-      image: "estate-management.jpg"
+      image: estateImg
     },
     {
       icon: <Building className="w-12 h-12 text-white" />,
       title: "General Construction",
       description: "Complete construction services from foundation to finish, delivering quality craftsmanship.",
       color: "bg-red-600",
-      image: "construction.jpg"
+      image: constructionImg
     },
     {
       icon: <Truck className="w-12 h-12 text-white" />,
       title: "Goods & Services Supply",
       description: "Comprehensive supply chain solutions for construction materials and specialized services.",
       color: "bg-emerald-600",
-      image: "supply-chain.jpg"
+      image: goodsImg
     },
     {
       icon: <Globe className="w-12 h-12 text-white" />,
       title: "International Negotiation",
       description: "Expert negotiation services for international property deals and construction contracts.",
       color: "bg-red-600",
-      image: "negotiation.jpg"
+      image: handshakeImg
     }
   ];
 
@@ -133,24 +265,136 @@ function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900 relative transition-colors duration-300">
       {/* Add custom animations */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Hurricane&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500&display=swap');
+        /* Ensure consistent scrollbar behavior */
+        html {
+          overflow-y: scroll;
+        }
         
-        /* Add animations for About section */
-        @keyframes float-diagonal {
-          0% {
-            transform: translateX(-100%) translateY(100%);
-          }
-          100% {
-            transform: translateX(100%) translateY(-100%);
+        /* Smooth scroll behavior */
+        html {
+          scroll-behavior: smooth;
+        }
+        
+        /* Adjust scroll padding to account for fixed navbar */
+        html {
+          scroll-padding-top: 80px;
+        }
+        
+        /* Prevent layout shift from scrollbar */
+        body {
+          overflow-y: scroll;
+        }
+        
+        /* Ensure consistent scrollbar width across browsers */
+        * {
+          scrollbar-width: thin;
+        }
+        
+        /* Custom scrollbar styling for webkit browsers */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: #c1c1c1;
+          border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+          background: #a8a8a8;
+        }
+        
+        /* Prevent horizontal overflow */
+        body, html {
+          overflow-x: hidden;
+          width: 100%;
+          position: relative;
+        }
+        
+        /* Services Swiper Styles */
+        .services-swiper {
+          display: flex;
+          width: 100%;
+          overflow-x: auto;
+          scroll-snap-type: x mandatory;
+          scrollbar-width: none;
+          gap: 20px;
+          padding: 20px 0;
+        }
+        
+        .services-swiper::-webkit-scrollbar {
+          display: none;
+        }
+        
+        .service-card {
+          scroll-snap-align: center;
+          min-width: 300px;
+          width: calc(100% - 40px);
+          flex: 0 0 auto;
+          transition: transform 0.3s ease;
+        }
+        
+        @media (min-width: 640px) {
+          .service-card {
+            width: calc(50% - 20px);
           }
         }
         
-        .diagonal-float {
-          animation: float-diagonal 15s linear infinite;
+        @media (min-width: 1024px) {
+          .service-card {
+            width: calc(33.333% - 20px);
+          }
+        }
+        
+        @media (min-width: 1280px) {
+          .service-card {
+            width: calc(25% - 20px);
+          }
+        }
+        
+        .service-card:hover {
+          transform: translateY(-5px);
+        }
+        
+        .swiper-nav-buttons {
+          display: flex;
+          justify-content: center;
+          gap: 12px;
+          margin-top: 24px;
+        }
+        
+        .swiper-nav-button {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: white;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        
+        .swiper-nav-button:hover {
+          background: #f9f9f9;
+          transform: scale(1.05);
+        }
+        
+        .dark .swiper-nav-button {
+          background: #374151;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .dark .swiper-nav-button:hover {
+          background: #4B5563;
         }
         
         /* Glass effect */
@@ -214,7 +458,7 @@ function App() {
       `}</style>
 
       {/* Navigation */}
-      <nav className="fixed w-full z-50 bg-white/95 backdrop-blur-md shadow-xl border-b border-gray-100">
+      <nav className={`fixed top-0 left-0 right-0 w-full z-50 backdrop-blur-md shadow-xl border-b border-gray-100 dark:border-gray-800 transition-all duration-300 ${isScrolled ? 'nav-scroll-bg' : 'bg-white/95 dark:bg-gray-900/95'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo and Company Name */}
@@ -230,13 +474,10 @@ function App() {
               
               {/* Company Name */}
               <div className="flex flex-col">
-                <h1 
-                  className="text-3xl font-normal text-gray-900 leading-none"
-                  style={{ fontFamily: 'Hurricane, cursive' }}
-                >
+                <h1 className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                   Brytwin Homes
                 </h1>
-                <p className="text-xs text-gray-600 font-medium tracking-wide uppercase">
+                <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                   & Construction Limited
                 </p>
               </div>
@@ -245,27 +486,27 @@ function App() {
             {/* Desktop Navigation */}
             <div className="hidden lg:block">
               <div className="flex items-center space-x-8">
-                <a href="#home" className="relative text-red-600 font-semibold text-sm uppercase tracking-wide hover:text-red-700 transition-colors group">
+                <a href="#home" className="relative text-red-600 dark:text-red-400 font-semibold text-sm uppercase tracking-wide hover:text-red-700 dark:hover:text-red-300 transition-colors group">
                   Home
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-100 transition-transform"></span>
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-100 transition-transform"></span>
                 </a>
-                <a href="#about" className="relative text-gray-700 font-semibold text-sm uppercase tracking-wide hover:text-red-600 transition-colors group">
+                <a href="#about" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   About Us
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="#services" className="relative text-gray-700 font-semibold text-sm uppercase tracking-wide hover:text-red-600 transition-colors group">
+                <a href="#services" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Services
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="#properties" className="relative text-gray-700 font-semibold text-sm uppercase tracking-wide hover:text-red-600 transition-colors group">
+                <a href="#properties" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Properties
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="#gallery" className="relative text-gray-700 font-semibold text-sm uppercase tracking-wide hover:text-red-600 transition-colors group">
+                <a href="#gallery" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Gallery
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="#contact" className="relative text-gray-700 font-semibold text-sm uppercase tracking-wide hover:text-red-600 transition-colors group">
+                <a href="#contact" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Contact
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
@@ -274,6 +515,9 @@ function App() {
                 <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
                   Book Now
                 </button>
+
+                {/* Theme Toggle */}
+                <ThemeToggle variant="desktop" />
               </div>
             </div>
 
@@ -281,7 +525,7 @@ function App() {
             <div className="lg:hidden">
               <button
                 onClick={toggleMenu}
-                className="p-2 rounded-lg text-gray-700 hover:text-red-600 hover:bg-gray-100 transition-all"
+                className="p-2 rounded-lg text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
               >
                 {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -294,7 +538,7 @@ function App() {
           isMenuOpen 
             ? 'opacity-100 visible' 
             : 'opacity-0 invisible pointer-events-none'
-        }`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
+        }`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}>
           {/* Backdrop */}
           <div 
             className={`absolute inset-0 bg-black transition-opacity duration-500 ${
@@ -305,11 +549,11 @@ function App() {
           />
           
           {/* Modal Content */}
-          <div className={`relative w-full h-full bg-white transform transition-transform duration-500 ease-in-out ${
+          <div className={`relative w-full h-full bg-white dark:bg-gray-900 transform transition-transform duration-500 ease-in-out ${
             isMenuOpen ? 'translate-x-0' : 'translate-x-full'
           }`} style={{ width: '100vw', height: '100vh', maxHeight: '100vh' }}>
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-white">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
               <div className="flex items-center space-x-3">
                 <img 
                   src={logo} 
@@ -318,13 +562,10 @@ function App() {
                 />
                 
                 <div className="flex flex-col">
-                  <h1 
-                    className="text-2xl font-normal text-gray-900 leading-none"
-                    style={{ fontFamily: 'Hurricane, cursive' }}
-                  >
+                  <h1 className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                     Brytwin Homes
                   </h1>
-                  <p className="text-xs text-gray-600 font-medium tracking-wide uppercase">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                     & Construction Limited
                   </p>
                 </div>
@@ -332,9 +573,9 @@ function App() {
               
               <button
                 onClick={toggleMenu}
-                className="p-3 rounded-full hover:bg-gray-100 transition-colors"
+                className="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
-                <X className="w-6 h-6 text-gray-700" />
+                <X className="w-6 h-6 text-gray-700 dark:text-gray-300" />
               </button>
             </div>
 
@@ -345,7 +586,7 @@ function App() {
                   <a 
                     href="#home" 
                     onClick={toggleMenu}
-                    className="flex items-center px-4 py-4 text-lg font-semibold text-red-600 bg-red-50 rounded-xl transition-all hover:bg-red-100"
+                    className="flex items-center px-4 py-4 text-lg font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-xl transition-all hover:bg-red-100 dark:hover:bg-red-900/30"
                   >
                     <Home className="w-5 h-5 mr-4" />
                     Home
@@ -353,7 +594,7 @@ function App() {
                   <a 
                     href="#about" 
                     onClick={toggleMenu}
-                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 rounded-xl transition-all hover:bg-gray-50 hover:text-red-600"
+                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Users className="w-5 h-5 mr-4" />
                     About Us
@@ -361,7 +602,7 @@ function App() {
                   <a 
                     href="#services" 
                     onClick={toggleMenu}
-                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 rounded-xl transition-all hover:bg-gray-50 hover:text-red-600"
+                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Building className="w-5 h-5 mr-4" />
                     Services
@@ -369,7 +610,7 @@ function App() {
                   <a 
                     href="#properties" 
                     onClick={toggleMenu}
-                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 rounded-xl transition-all hover:bg-gray-50 hover:text-red-600"
+                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Home className="w-5 h-5 mr-4" />
                     Properties
@@ -377,7 +618,7 @@ function App() {
                   <a 
                     href="#gallery" 
                     onClick={toggleMenu}
-                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 rounded-xl transition-all hover:bg-gray-50 hover:text-red-600"
+                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Globe className="w-5 h-5 mr-4" />
                     Gallery
@@ -385,17 +626,23 @@ function App() {
                   <a 
                     href="#contact" 
                     onClick={toggleMenu}
-                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 rounded-xl transition-all hover:bg-gray-50 hover:text-red-600"
+                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Phone className="w-5 h-5 mr-4" />
                     Contact
                   </a>
                 </nav>
 
+                {/* Theme Toggle */}
+                <div className="mt-8">
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide mb-3">Appearance</h4>
+                  <ThemeToggle variant="mobile" />
+                </div>
+
                 {/* CTA Section */}
-                <div className="mt-12 p-6 bg-gradient-to-r from-red-50 to-emerald-50 rounded-2xl">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Ready to Get Started?</h3>
-                  <p className="text-gray-600 text-sm mb-4">Book a consultation and let's discuss your project.</p>
+                <div className="mt-8 p-6 bg-gradient-to-r from-red-50 to-emerald-50 dark:from-red-900/20 dark:to-emerald-900/20 rounded-2xl">
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Ready to Get Started?</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">Book a consultation and let's discuss your project.</p>
                   <button 
                     onClick={toggleMenu}
                     className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-4 rounded-xl text-base font-bold uppercase tracking-wide shadow-lg transition-all duration-200"
@@ -406,18 +653,18 @@ function App() {
 
                 {/* Contact Info */}
                 <div className="mt-8 space-y-4">
-                  <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wide">Contact Info</h4>
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide">Contact Info</h4>
                   <div className="space-y-3">
-                    <div className="flex items-center text-gray-600">
-                      <Phone className="w-4 h-4 mr-3 text-red-600" />
+                    <div className="flex items-center text-gray-600 dark:text-gray-400">
+                      <Phone className="w-4 h-4 mr-3 text-red-600 dark:text-red-400" />
                       <span className="text-sm">(+233) 55 805 6649</span>
                     </div>
-                    <div className="flex items-center text-gray-600">
-                      <Mail className="w-4 h-4 mr-3 text-red-600" />
+                    <div className="flex items-center text-gray-600 dark:text-gray-400">
+                      <Mail className="w-4 h-4 mr-3 text-red-600 dark:text-red-400" />
                       <span className="text-sm">info@brytwinhomes.com</span>
                     </div>
-                    <div className="flex items-center text-gray-600">
-                      <MapPin className="w-4 h-4 mr-3 text-red-600" />
+                    <div className="flex items-center text-gray-600 dark:text-gray-400">
+                      <MapPin className="w-4 h-4 mr-3 text-red-600 dark:text-red-400" />
                       <span className="text-sm">Accra, Ghana</span>
                     </div>
                   </div>
@@ -425,15 +672,15 @@ function App() {
               </div>
 
               {/* Footer */}
-              <div className="px-6 py-6 border-t border-gray-200 bg-gray-50 mt-auto">
+              <div className="px-6 py-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 mt-auto">
                 <div className="flex items-center justify-between">
                   <div className="flex space-x-4">
-                    <Facebook className="w-5 h-5 text-gray-400 hover:text-red-600 cursor-pointer transition-colors" />
-                    <Twitter className="w-5 h-5 text-gray-400 hover:text-red-600 cursor-pointer transition-colors" />
-                    <Instagram className="w-5 h-5 text-gray-400 hover:text-red-600 cursor-pointer transition-colors" />
-                    <Linkedin className="w-5 h-5 text-gray-400 hover:text-red-600 cursor-pointer transition-colors" />
+                    <Facebook className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
+                    <Twitter className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
+                    <Instagram className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
+                    <Linkedin className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
                   </div>
-                  <p className="text-xs text-gray-500">© 2024 Brytwin Homes</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">© 2024 Brytwin Homes</p>
                 </div>
               </div>
             </div>
@@ -444,14 +691,16 @@ function App() {
       {/* Hero Section */}
       <section 
         id="home" 
-        className="relative flex items-center justify-center bg-cover bg-center"
+        className={`relative flex items-center justify-center bg-cover bg-center pt-20 hero-bg ${heroSlide === 2 ? 'slide-2' : ''} ${mobileHeroImage === 2 ? 'mobile-hero-2' : ''}`}
         style={{
-          backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.pexels.com/photos/8487390/pexels-photo-8487390.jpeg?auto=compress&cs=tinysrgb&w=1920')",
-          height: '70vh',
-          minHeight: '70vh'
-        }}
+          height: 'calc(70vh + 80px)',
+          minHeight: 'calc(70vh + 80px)',
+          '--mobile-hero-2': `url(${hero2Img})`
+        } as React.CSSProperties & { '--mobile-hero-2': string }}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
       >
-        <div className="text-center text-white max-w-4xl mx-auto px-4 pt-20 animate-fade-in-up">
+        <div className="text-center text-white max-w-4xl mx-auto px-4 animate-fade-in-up">
           <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-slide-up" style={{ animationDelay: '0.2s' }}>
             Building Excellence,<br />
             <span className="text-emerald-400">Negotiating Globally, Managing Estates</span>
@@ -468,26 +717,36 @@ function App() {
             </button>
           </div>
         </div>
+
+        {/* Slideshow Indicators - Only visible on desktop */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 hidden md:flex space-x-3">
+          <button 
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${heroSlide === 1 ? 'bg-white' : 'bg-white/40 hover:bg-white/60'}`}
+            onClick={() => setHeroSlide(1)}
+            aria-label="Show slide 1"
+          />
+          <button 
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${heroSlide === 2 ? 'bg-white' : 'bg-white/40 hover:bg-white/60'}`}
+            onClick={() => setHeroSlide(2)}
+            aria-label="Show slide 2"
+          />
+        </div>
       </section>
 
       {/* About Snippet */}
-      <section id="about" className="py-16 bg-gray-50 relative overflow-hidden">
-        {/* Animated diagonal blocks */}
-        <div className="absolute inset-0 overflow-hidden z-0">
-          <div className="diagonal-float absolute w-96 h-96 bg-red-500/10 rounded-full blur-3xl"></div>
-          <div className="diagonal-float absolute w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" style={{ animationDelay: '3s', left: '30%' }}></div>
-          <div className="diagonal-float absolute w-96 h-96 bg-white/10 rounded-full blur-3xl" style={{ animationDelay: '6s', left: '60%' }}></div>
-        </div>
-        
+      <section id="about" className="pt-16 pb-4 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 relative scroll-mt-20 transition-colors duration-300">        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-12">
-            <h3 className="text-4xl font-bold text-gray-900 mb-4">
-              About <span className="font-normal" style={{ fontFamily: 'Hurricane, cursive' }}>Brytwin Homes & Construction Ltd</span>
+          <div className="text-center">
+            <h3 
+              ref={aboutTitleRef.ref}
+              className={`text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300 slide-up ${aboutTitleRef.inView ? 'in-view' : ''}`}
+            >
+              About <span className="font-normal font-hurricane">Brytwin Homes & Construction Ltd</span>
             </h3>
             <p 
-              className="text-xl text-gray-700 max-w-3xl mx-auto" 
+              ref={aboutDescRef.ref}
+              className={`text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto font-ibm-plex transition-colors duration-300 fade-in ${aboutDescRef.inView ? 'in-view' : ''}`}
               style={{ 
-                fontFamily: "'IBM Plex Serif', serif",
                 lineHeight: '1.8',
                 letterSpacing: '0.01em',
                 fontWeight: '400'
@@ -495,50 +754,93 @@ function App() {
             >
               Born with a hustling mindset but determined scope, Mr. Bright 'Last-Name' turned passion into purpose. Launching and Managing a construction company grounded in hard work, vision, and integrity. Without the industry standard university degree, he relied on hands-on experience and determination to master construction, international management, and estate management. Today, he and his team delivers projects with the same drive that started this journey: Quality, Trust, and Results that last.
             </p>
-            <button className="mt-6 text-red-600 font-medium hover:text-red-700 transition-colors flex items-center justify-center mx-auto">
+            <button 
+              ref={aboutButtonRef.ref}
+              className={`mt-6 text-red-600 dark:text-red-400 font-medium hover:text-red-700 dark:hover:text-red-300 transition-colors flex items-center justify-center mx-auto scale-in pulse-on-hover ${aboutButtonRef.inView ? 'in-view' : ''}`}
+            >
               Read More <ArrowRight className="ml-2 w-4 h-4" />
             </button>
           </div>
         </div>
+        
+        {/* Background decoration - same as Services section */}
+        <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-gradient-to-br from-red-500/20 to-red-500/5 rounded-full blur-xl"></div>
+        <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 rounded-full blur-xl"></div>
       </section>
       
       {/* Our Services */}
-      <section id="services" className="py-20 bg-gradient-to-br from-gray-100 to-gray-200 relative">
+      <section id="services" className="pt-10 pb-20 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 relative scroll-mt-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold text-gray-900 mb-4">Our Services</h3>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <h3 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
+              Our Services
+            </h3>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto transition-colors duration-300">
               Comprehensive solutions for all your property and construction needs
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+          {/* Services Swiper */}
+          <div className="services-swiper" 
+               onTouchStart={handleTouchStart} 
+               onTouchMove={handleTouchMove} 
+               onTouchEnd={handleTouchEnd}
+               id="servicesSwiper">
             {services.map((service, index) => (
-              <div 
-                key={index}
-                className="group glass rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 hover:scale-[1.01] relative"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-transparent z-10"></div>
-                <div className="relative h-64 overflow-hidden">
-                  <img 
-                    src={`/services/${service.image}`}
-                    alt={service.title}
-                    className="w-full h-full object-cover"
+              <div key={index} className="service-card">
+                <div className="relative h-full bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl h-[450px]">
+                  {/* Background Image */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-10"></div>
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url(${service.image})`
+                    }}
                   />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 p-8 z-20">
-                  <div className={`${service.color} w-16 h-16 rounded-xl flex justify-center items-center mb-4 shadow-lg transform -translate-y-10`}>
-                    {service.icon}
+                  
+                  {/* Content */}
+                  <div className="relative z-20 p-6 md:p-8 h-full flex flex-col justify-between">
+                    <div>
+                      <div className={`${service.color} w-12 h-12 md:w-16 md:h-16 rounded-xl flex justify-center items-center mb-4 md:mb-6 shadow-lg`}>
+                        {service.icon}
+                      </div>
+                      <h4 className="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4">{service.title}</h4>
+                      <p className="text-white/90 text-base md:text-lg leading-relaxed mb-4 md:mb-6">
+                        {service.description}
+                      </p>
+                    </div>
+                    
+                    <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center w-fit">
+                      Learn More <ArrowRight className="ml-2 w-4 h-4" />
+                    </button>
                   </div>
-                  <h4 className="text-2xl font-bold text-white mb-3">{service.title}</h4>
-                  <p className="text-white/80 transition-all duration-500 max-h-0 group-hover:max-h-40 opacity-0 group-hover:opacity-100 overflow-hidden">
-                    {service.description}
-                  </p>
-                  <button className="mt-4 text-white flex items-center text-sm font-medium">
-                    Learn More <ArrowRight className="ml-2 w-4 h-4" />
-                  </button>
                 </div>
               </div>
             ))}
+          </div>
+          
+          {/* Navigation Buttons */}
+          <div className="swiper-nav-buttons">
+            <button 
+              onClick={() => {
+                const swiper = document.getElementById('servicesSwiper');
+                if (swiper) swiper.scrollBy({ left: -320, behavior: 'smooth' });
+              }}
+              className="swiper-nav-button text-gray-700 dark:text-gray-300"
+              aria-label="Previous service"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button 
+              onClick={() => {
+                const swiper = document.getElementById('servicesSwiper');
+                if (swiper) swiper.scrollBy({ left: 320, behavior: 'smooth' });
+              }}
+              className="swiper-nav-button text-gray-700 dark:text-gray-300"
+              aria-label="Next service"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
           </div>
         </div>
         
@@ -548,11 +850,11 @@ function App() {
       </section>
 
       {/* Featured Properties */}
-      <section id="properties" className="py-20 bg-gray-50">
+      <section id="properties" className="py-20 bg-gray-50 dark:bg-gray-800 scroll-mt-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold text-gray-900 mb-4">Featured Properties</h3>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h3 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Featured Properties</h3>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto transition-colors duration-300">
               Discover our premium selection of luxury homes and investment properties
             </p>
           </div>
@@ -560,7 +862,7 @@ function App() {
             {properties.map((property, index) => (
               <div 
                 key={index}
-                className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+                className="bg-white dark:bg-gray-900 rounded-xl shadow-lg dark:shadow-gray-900/50 overflow-hidden hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-300 transform hover:-translate-y-1"
               >
                 <div className="relative">
                   <img 
@@ -573,12 +875,12 @@ function App() {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">{property.title}</h4>
-                  <p className="text-gray-600 mb-4 flex items-center">
+                  <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">{property.title}</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4 flex items-center transition-colors duration-300">
                     <MapPin className="w-4 h-4 mr-1" />
                     {property.location}
                   </p>
-                  <div className="flex justify-between text-sm text-gray-600 mb-4">
+                  <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-300">
                     <span>{property.beds} Beds</span>
                     <span>{property.baths} Baths</span>
                     <span>{property.area}</span>
@@ -594,22 +896,22 @@ function App() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-20">
+      <section className="py-20 scroll-mt-20 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold text-gray-900 mb-4">Why Choose Us</h3>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h3 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Why Choose Us</h3>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto transition-colors duration-300">
               Your success is our priority. Here's what sets us apart
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {whyChooseUs.map((item, index) => (
               <div key={index} className="text-center group">
-                <div className="bg-emerald-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-100 transition-colors">
+                <div className="bg-emerald-50 dark:bg-emerald-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/30 transition-colors">
                   {item.icon}
                 </div>
-                <h4 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h4>
-                <p className="text-gray-600">{item.description}</p>
+                <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">{item.title}</h4>
+                <p className="text-gray-600 dark:text-gray-400 transition-colors duration-300">{item.description}</p>
               </div>
             ))}
           </div>
@@ -617,26 +919,31 @@ function App() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-800 scroll-mt-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold text-gray-900 mb-4">Client Testimonials</h3>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <h3 
+              ref={testimonialsRef.ref}
+              className={`text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300 slide-up ${testimonialsRef.inView ? 'in-view' : ''}`}
+            >
+              Client Testimonials
+            </h3>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto transition-colors duration-300">
               Hear what our satisfied clients have to say about our services
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white p-8 rounded-xl shadow-lg">
+              <div key={index} className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg dark:shadow-gray-900/50 transition-colors duration-300">
                 <div className="flex mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-600 mb-6 italic">"{testimonial.content}"</p>
+                <p className="text-gray-600 dark:text-gray-400 mb-6 italic transition-colors duration-300">"{testimonial.content}"</p>
                 <div>
-                  <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
-                  <p className="text-gray-600 text-sm">{testimonial.role}</p>
+                  <h4 className="font-bold text-gray-900 dark:text-white transition-colors duration-300">{testimonial.name}</h4>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm transition-colors duration-300">{testimonial.role}</p>
                 </div>
               </div>
             ))}
@@ -645,7 +952,7 @@ function App() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-20 bg-gradient-to-r from-red-600 to-emerald-600">
+      <section className="py-20 bg-gradient-to-r from-red-600 to-emerald-600 scroll-mt-20">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h3 className="text-4xl font-bold text-white mb-6">
             Ready to Start Your Journey?
@@ -660,29 +967,36 @@ function App() {
       </section>
 
       {/* Footer */}
-      <footer id="contact" className="bg-gray-900 text-white py-16">
+      <footer id="contact" className="bg-gray-900 dark:bg-gray-950 text-white py-16 scroll-mt-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div 
+            ref={contactSectionRef.ref}
+            className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8"
+          >
             {/* Company Info */}
-            <div className="col-span-1 md:col-span-2">
+            <div className={`col-span-1 md:col-span-2 stagger-item ${contactSectionRef.visibleItems[0] ? 'visible' : ''}`}>
               <div className="flex items-center mb-6">
-                <div className="bg-red-600 text-white p-2 rounded-lg mr-3">
-                  <Home className="w-6 h-6" />
-                </div>
+                <img 
+                  src={logo} 
+                  alt="Brytwin Homes Logo" 
+                  className="w-12 h-12 rounded-lg mr-3 object-cover"
+                />
                 <div>
-                  <h4 className="text-xl font-bold">Brytwin Homes</h4>
+                  <h4 className="text-xl font-bold">
+                    <span className="font-hurricane">Brytwin Homes</span>
+                  </h4>
                   <p className="text-sm text-gray-400">& Construction Limited</p>
                 </div>
               </div>
-              <p className="text-gray-400 mb-6 max-w-md">
+              <p className="text-gray-400 dark:text-gray-500 mb-6 max-w-md transition-colors duration-300">
                 Your trusted partner in luxury real estate, construction, and property management services. 
                 Excellence in every project, professionalism in every interaction.
               </p>
               <div className="flex space-x-4">
-                <Facebook className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
-                <Twitter className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
-                <Instagram className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
-                <Linkedin className="w-6 h-6 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+                <Facebook className="w-6 h-6 text-gray-400 dark:text-gray-500 hover:text-white cursor-pointer transition-colors" />
+                <Twitter className="w-6 h-6 text-gray-400 dark:text-gray-500 hover:text-white cursor-pointer transition-colors" />
+                <Instagram className="w-6 h-6 text-gray-400 dark:text-gray-500 hover:text-white cursor-pointer transition-colors" />
+                <Linkedin className="w-6 h-6 text-gray-400 dark:text-gray-500 hover:text-white cursor-pointer transition-colors" />
               </div>
             </div>
 
@@ -690,11 +1004,11 @@ function App() {
             <div>
               <h4 className="text-lg font-bold mb-6">Quick Links</h4>
               <ul className="space-y-3">
-                <li><a href="#home" className="text-gray-400 hover:text-white transition-colors">Home</a></li>
-                <li><a href="#about" className="text-gray-400 hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#services" className="text-gray-400 hover:text-white transition-colors">Services</a></li>
-                <li><a href="#properties" className="text-gray-400 hover:text-white transition-colors">Properties</a></li>
-                <li><a href="#gallery" className="text-gray-400 hover:text-white transition-colors">Gallery</a></li>
+                <li><a href="#home" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Home</a></li>
+                <li><a href="#about" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">About Us</a></li>
+                <li><a href="#services" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Services</a></li>
+                <li><a href="#properties" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
+                <li><a href="#gallery" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Gallery</a></li>
               </ul>
             </div>
 
@@ -703,16 +1017,16 @@ function App() {
               <h4 className="text-lg font-bold mb-6">Contact Info</h4>
               <div className="space-y-4">
                 <div className="flex items-center">
-                  <Phone className="w-5 h-5 text-red-600 mr-3" />
-                  <span className="text-gray-400">(+233) 55 805 6649</span>
+                  <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
+                  <span className="text-gray-400 dark:text-gray-500">(+233) 55 805 6649</span>
                 </div>
                 <div className="flex items-center">
-                  <Mail className="w-5 h-5 text-red-600 mr-3" />
-                  <span className="text-gray-400">info@brytwinhomes.com</span>
+                  <Mail className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
+                  <span className="text-gray-400 dark:text-gray-500">info@brytwinhomes.com</span>
                 </div>
                 <div className="flex items-start">
-                  <MapPin className="w-5 h-5 text-red-600 mr-3 mt-1" />
-                  <span className="text-gray-400">Accra, Ghana</span>
+                  <MapPin className="w-5 h-5 text-red-600 dark:text-red-400 mr-3 mt-1" />
+                  <span className="text-gray-400 dark:text-gray-500">Accra, Ghana</span>
                 </div>
               </div>
 
@@ -723,7 +1037,7 @@ function App() {
                   <input 
                     type="email" 
                     placeholder="Your email"
-                    className="flex-1 px-3 py-2 bg-gray-800 text-white rounded-l-lg border border-gray-700 focus:outline-none focus:border-red-600"
+                    className="flex-1 px-3 py-2 bg-gray-800 dark:bg-gray-950 text-white rounded-l-lg border border-gray-700 dark:border-gray-600 focus:outline-none focus:border-red-600 dark:focus:border-red-400 transition-colors duration-300"
                   />
                   <button className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-r-lg transition-colors">
                     Subscribe
@@ -734,8 +1048,8 @@ function App() {
           </div>
 
           {/* Copyright */}
-          <div className="border-t border-gray-800 pt-8 text-center">
-            <p className="text-gray-400">
+          <div className="border-t border-gray-800 dark:border-gray-600 pt-8 text-center">
+            <p className="text-gray-400 dark:text-gray-500 transition-colors duration-300">
               © 2024 Brytwin Homes & Construction Limited. All rights reserved.
             </p>
           </div>
