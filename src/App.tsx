@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import AboutUs from './components/AboutUs';
 import { 
   Menu, 
   X, 
@@ -31,15 +33,51 @@ import handshakeImg from './handshake.jpg';
 import { ThemeToggle } from './components/ThemeToggle';
 import { useInView, useStaggeredInView } from './hooks/useInView';
 
-function App() {
+function MainApp() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [heroSlide, setHeroSlide] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
+  const [currentService, setCurrentService] = useState(0);
+  const [isServicesPaused, setIsServicesPaused] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [mobileHeroImage, setMobileHeroImage] = useState(1); // 1 for default, 2 for hero2
   const [lastScrollY, setLastScrollY] = useState(0);
   const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const navigate = useNavigate();
+
+  const services = [
+    {
+      icon: <Home className="w-12 h-12 text-white" />,
+      title: "Estate Management & Sales",
+      description: "Professional property management and sales services for luxury residential and commercial properties.",
+      color: "bg-emerald-600",
+      image: estateImg
+    },
+    {
+      icon: <Building className="w-12 h-12 text-white" />,
+      title: "General Construction",
+      description: "Complete construction services from foundation to finish, delivering quality craftsmanship.",
+      color: "bg-red-600",
+      image: constructionImg
+    },
+    {
+      icon: <Truck className="w-12 h-12 text-white" />,
+      title: "Goods & Services Supply",
+      description: "Comprehensive supply chain solutions for construction materials and specialized services.",
+      color: "bg-emerald-600",
+      image: goodsImg
+    },
+    {
+      icon: <Globe className="w-12 h-12 text-white" />,
+      title: "International Negotiation",
+      description: "Expert negotiation services for international property deals and construction contracts.",
+      color: "bg-red-600",
+      image: handshakeImg
+    }
+  ];
 
   // Animation hooks
   const aboutTitleRef = useInView<HTMLHeadingElement>({ threshold: 0.3 });
@@ -50,25 +88,30 @@ function App() {
   const testimonialsRef = useInView<HTMLHeadingElement>({ threshold: 0.3 });
   
   // Navigation scroll state
-  const [isScrolled, setIsScrolled] = useState(false);
-
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   // Navigate to next service
   const nextService = () => {
-    const swiper = document.getElementById('servicesSwiper');
-    if (swiper) swiper.scrollBy({ left: 320, behavior: 'smooth' });
+    setCurrentService(prev => (prev + 1) % services.length);
   };
 
   // Navigate to previous service
   const prevService = () => {
-    const swiper = document.getElementById('servicesSwiper');
-    if (swiper) swiper.scrollBy({ left: -320, behavior: 'smooth' });
+    setCurrentService(prev => prev === 0 ? services.length - 1 : prev - 1);
   };
 
-  // No longer needed with the new swiper design
+  // Get card position class for coverflow effect
+  const getCardClass = (index: number) => {
+    const diff = (index - currentService + services.length) % services.length;
+    if (diff === 0) return 'center';
+    if (diff === 1) return 'right-1';
+    if (diff === 2) return 'right-2';
+    if (diff === services.length - 1) return 'left-1';
+    if (diff === services.length - 2) return 'left-2';
+    return 'hidden';
+  };
 
-  // Touch handlers for mobile swipe - handled natively by the scrollable container
+  // Touch handlers for mobile swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(0);
     setTouchStart(e.targetTouches[0].clientX);
@@ -79,8 +122,6 @@ function App() {
   };
 
   const handleTouchEnd = () => {
-    // We'll let the native scroll handle most of the swiping
-    // This is just for additional swipe detection if needed
     if (!touchStart || !touchEnd) return;
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > 100;
@@ -112,7 +153,18 @@ function App() {
     return () => clearInterval(interval);
   }, [isPaused]);
 
-  // Mobile hero scroll-based image switching and navigation background
+  // Auto-advance services carousel
+  useEffect(() => {
+    if (isServicesPaused) return;
+    
+    const interval = setInterval(() => {
+      setCurrentService(prev => (prev + 1) % services.length);
+    }, 5000); // Switch every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [isServicesPaused, services.length]);
+
+  // Navigation scroll state and mobile hero switch
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -158,37 +210,6 @@ function App() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY, hasScrolledPastHero, mobileHeroImage, isScrolled]);
-
-  const services = [
-    {
-      icon: <Home className="w-12 h-12 text-white" />,
-      title: "Estate Management & Sales",
-      description: "Professional property management and sales services for luxury residential and commercial properties.",
-      color: "bg-emerald-600",
-      image: estateImg
-    },
-    {
-      icon: <Building className="w-12 h-12 text-white" />,
-      title: "General Construction",
-      description: "Complete construction services from foundation to finish, delivering quality craftsmanship.",
-      color: "bg-red-600",
-      image: constructionImg
-    },
-    {
-      icon: <Truck className="w-12 h-12 text-white" />,
-      title: "Goods & Services Supply",
-      description: "Comprehensive supply chain solutions for construction materials and specialized services.",
-      color: "bg-emerald-600",
-      image: goodsImg
-    },
-    {
-      icon: <Globe className="w-12 h-12 text-white" />,
-      title: "International Negotiation",
-      description: "Expert negotiation services for international property deals and construction contracts.",
-      color: "bg-red-600",
-      image: handshakeImg
-    }
-  ];
 
   const properties = [
     {
@@ -238,29 +259,6 @@ function App() {
       role: "Business Owner",
       content: "Their estate management services have been invaluable for our commercial properties. Highly recommend their expertise.",
       rating: 5
-    }
-  ];
-
-  const whyChooseUs = [
-    {
-      icon: <Shield className="w-8 h-8 text-emerald-600" />,
-      title: "Trust",
-      description: "Proven track record with transparent processes"
-    },
-    {
-      icon: <Award className="w-8 h-8 text-emerald-600" />,
-      title: "Quality",
-      description: "Premium craftsmanship in every project"
-    },
-    {
-      icon: <Users className="w-8 h-8 text-emerald-600" />,
-      title: "Professionalism",
-      description: "Dedicated team of industry experts"
-    },
-    {
-      icon: <CheckCircle className="w-8 h-8 text-emerald-600" />,
-      title: "Experience",
-      description: "Years of successful project delivery"
     }
   ];
 
@@ -318,49 +316,134 @@ function App() {
           position: relative;
         }
         
-        /* Services Swiper Styles */
-        .services-swiper {
+        /* Coverflow Swiper Styles */
+        .services-coverflow {
           display: flex;
-          width: 100%;
-          overflow-x: auto;
-          scroll-snap-type: x mandatory;
-          scrollbar-width: none;
-          gap: 20px;
-          padding: 20px 0;
+          justify-content: center;
+          align-items: center;
+          position: relative;
+          height: 650px;
+          perspective: 1500px;
+          overflow: visible;
+          margin: 0 auto;
+          max-width: 1600px;
+          padding: 0 100px;
         }
         
-        .services-swiper::-webkit-scrollbar {
-          display: none;
+        .coverflow-container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          transform-style: preserve-3d;
+          transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          width: 100%;
+          height: 100%;
         }
         
         .service-card {
-          scroll-snap-align: center;
-          min-width: 300px;
-          width: calc(100% - 40px);
-          flex: 0 0 auto;
-          transition: transform 0.3s ease;
+          position: absolute;
+          width: 450px;
+          height: 580px;
+          transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          transform-style: preserve-3d;
+          cursor: pointer;
         }
         
-        @media (min-width: 640px) {
+        .service-card.center {
+          transform: translateX(-50%) translateZ(0) rotateY(0deg) scale(1.15);
+          z-index: 10;
+          opacity: 1;
+          left: 50%;
+        }
+        
+        .service-card.left-1 {
+          transform: translateX(-140%) translateZ(-250px) rotateY(30deg) scale(0.9);
+          z-index: 8;
+          opacity: 0.9;
+          left: 50%;
+        }
+        
+        .service-card.left-2 {
+          transform: translateX(-240%) translateZ(-450px) rotateY(40deg) scale(0.75);
+          z-index: 6;
+          opacity: 0.6;
+          left: 50%;
+        }
+        
+        .service-card.right-1 {
+          transform: translateX(40%) translateZ(-250px) rotateY(-30deg) scale(0.9);
+          z-index: 8;
+          opacity: 0.9;
+          left: 50%;
+        }
+        
+        .service-card.right-2 {
+          transform: translateX(140%) translateZ(-450px) rotateY(-40deg) scale(0.75);
+          z-index: 6;
+          opacity: 0.6;
+          left: 50%;
+        }
+        
+        .service-card.hidden {
+          transform: translateX(-350%) translateZ(-650px) rotateY(55deg) scale(0.5);
+          z-index: 1;
+          opacity: 0;
+          left: 50%;
+        }
+        
+        @media (max-width: 768px) {
+          .services-coverflow {
+            height: 550px;
+            perspective: 1000px;
+            padding: 0 20px;
+          }
+          
           .service-card {
-            width: calc(50% - 20px);
+            width: 320px;
+            height: 480px;
+          }
+          
+          .service-card.center {
+            transform: translateX(-50%) translateZ(0) rotateY(0deg) scale(1.05);
+          }
+          
+          .service-card.left-1 {
+            transform: translateX(-110%) translateZ(-180px) rotateY(25deg) scale(0.85);
+          }
+          
+          .service-card.right-1 {
+            transform: translateX(10%) translateZ(-180px) rotateY(-25deg) scale(0.85);
+          }
+          
+          .service-card.left-2,
+          .service-card.right-2 {
+            opacity: 0;
+            pointer-events: none;
           }
         }
         
-        @media (min-width: 1024px) {
-          .service-card {
-            width: calc(33.333% - 20px);
+        @media (max-width: 480px) {
+          .services-coverflow {
+            height: 500px;
+            padding: 0 10px;
           }
-        }
-        
-        @media (min-width: 1280px) {
+          
           .service-card {
-            width: calc(25% - 20px);
+            width: 280px;
+            height: 430px;
           }
-        }
-        
-        .service-card:hover {
-          transform: translateY(-5px);
+          
+          .service-card.center {
+            transform: translateX(-50%) translateZ(0) rotateY(0deg) scale(1);
+          }
+          
+          .service-card.left-1 {
+            transform: translateX(-95%) translateZ(-150px) rotateY(20deg) scale(0.8);
+          }
+          
+          .service-card.right-1 {
+            transform: translateX(-5%) translateZ(-150px) rotateY(-20deg) scale(0.8);
+          }
         }
         
         .swiper-nav-buttons {
@@ -444,6 +527,10 @@ function App() {
             transform: scale(1);
           }
         }
+        @keyframes pulse-glow {
+          0%, 100% { opacity: 0.8; filter: blur(8px); }
+          50% { opacity: 1; filter: blur(12px); }
+        }
         .animate-fade-in-up {
           animation: fade-in-up 1s ease-out forwards;
         }
@@ -455,10 +542,26 @@ function App() {
           animation: bounce-in 0.8s ease-out forwards;
           opacity: 0;
         }
+        .animate-pulse-glow {
+          animation: pulse-glow 4s ease-in-out infinite;
+        }
+        
+        .geo-grid {
+          background-image: 
+            linear-gradient(to right, rgba(226, 232, 240, 0.1) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(226, 232, 240, 0.1) 1px, transparent 1px);
+          background-size: 40px 40px;
+        }
+
+        .dark .geo-grid {
+          background-image: 
+            linear-gradient(to right, rgba(226, 232, 240, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(226, 232, 240, 0.05) 1px, transparent 1px);
+        }
       `}</style>
 
-      {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 w-full z-50 backdrop-blur-md shadow-xl border-b border-gray-100 dark:border-gray-800 transition-all duration-300 ${isScrolled ? 'nav-scroll-bg' : 'bg-white/95 dark:bg-gray-900/95'}`}>
+  {/* Navigation */}
+  <nav className={`fixed top-0 left-0 right-0 w-full z-50 backdrop-blur-md shadow-xl border-b border-gray-100 dark:border-gray-800 transition-all duration-300 ${isScrolled ? 'nav-scroll-bg' : 'bg-white/95 dark:bg-gray-900/95'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo and Company Name */}
@@ -490,11 +593,11 @@ function App() {
                   Home
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-100 transition-transform"></span>
                 </a>
-                <a href="#about" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/about" onClick={e => {e.preventDefault(); navigate && navigate('/about');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   About Us
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="#services" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/Services" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Services
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
@@ -592,8 +695,8 @@ function App() {
                     Home
                   </a>
                   <a 
-                    href="#about" 
-                    onClick={toggleMenu}
+                    href="/about" 
+                    onClick={e => {e.preventDefault(); toggleMenu(); navigate && navigate('/about');}}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Users className="w-5 h-5 mr-4" />
@@ -769,7 +872,20 @@ function App() {
       </section>
       
       {/* Our Services */}
-      <section id="services" className="pt-10 pb-20 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 relative scroll-mt-20 transition-colors duration-300">
+      <section id="services" className="relative pt-10 pb-20 overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 scroll-mt-20 transition-colors duration-500">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10 dark:opacity-20">
+          <div className="absolute inset-0 bg-[url('https://assets.website-files.com/63904f663019b0d8edf8d57c/63915f9833eeee75f4917569_pattern-light.svg')] dark:bg-[url('https://assets.website-files.com/63904f663019b0d8edf8d57c/63915f9833eeee4b73917568_pattern-dark.svg')] bg-repeat w-full h-full"></div>
+        </div>
+        
+        {/* Geometric Grid */}
+        <div className="absolute inset-0 geo-grid"></div>
+        
+        {/* Animated Shapes */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-500/30 dark:bg-red-600/20 rounded-full blur-3xl animate-pulse-glow"></div>
+        <div className="absolute bottom-1/3 right-1/4 w-72 h-72 bg-emerald-500/20 dark:bg-emerald-600/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }}></div>
+        
+        {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-8">
             <h3 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
@@ -780,62 +896,67 @@ function App() {
             </p>
           </div>
 
-          {/* Services Swiper */}
-          <div className="services-swiper" 
-               onTouchStart={handleTouchStart} 
-               onTouchMove={handleTouchMove} 
-               onTouchEnd={handleTouchEnd}
-               id="servicesSwiper">
-            {services.map((service, index) => (
-              <div key={index} className="service-card">
-                <div className="relative h-full bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl h-[450px]">
-                  {/* Background Image */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-10"></div>
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url(${service.image})`
-                    }}
-                  />
-                  
-                  {/* Content */}
-                  <div className="relative z-20 p-6 md:p-8 h-full flex flex-col justify-between">
-                    <div>
-                      <div className={`${service.color} w-12 h-12 md:w-16 md:h-16 rounded-xl flex justify-center items-center mb-4 md:mb-6 shadow-lg`}>
-                        {service.icon}
-                      </div>
-                      <h4 className="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4">{service.title}</h4>
-                      <p className="text-white/90 text-base md:text-lg leading-relaxed mb-4 md:mb-6">
-                        {service.description}
-                      </p>
-                    </div>
+          {/* Services Coverflow */}
+          <div 
+            className="services-coverflow"
+            onMouseEnter={() => setIsServicesPaused(true)}
+            onMouseLeave={() => setIsServicesPaused(false)}
+            onTouchStart={handleTouchStart} 
+            onTouchMove={handleTouchMove} 
+            onTouchEnd={handleTouchEnd}
+          >
+            <div className="coverflow-container">
+              {services.map((service, index) => (
+                <div 
+                  key={index} 
+                  className={`service-card ${getCardClass(index)}`}
+                  onClick={() => setCurrentService(index)}
+                >
+                  <div className="relative h-full bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl">
+                    {/* Background Image */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-10"></div>
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center"
+                      style={{
+                        backgroundImage: `url(${service.image})`
+                      }}
+                    />
                     
-                    <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center w-fit">
-                      Learn More <ArrowRight className="ml-2 w-4 h-4" />
-                    </button>
+                    {/* Content */}
+                    <div className="relative z-20 p-6 md:p-8 h-full flex flex-col">
+                      <div className="flex-1">
+                        <div className={`${service.color} w-12 h-12 md:w-16 md:h-16 rounded-xl flex justify-center items-center mb-4 md:mb-6 shadow-lg`}>
+                          {service.icon}
+                        </div>
+                        <h4 className="text-2xl md:text-3xl font-bold text-white mb-3 md:mb-4">{service.title}</h4>
+                        <p className="text-white/90 text-base md:text-lg leading-relaxed">
+                          {service.description}
+                        </p>
+                      </div>
+                      
+                      <div className="mt-6">
+                        <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center w-fit">
+                          Learn More <ArrowRight className="ml-2 w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
           
           {/* Navigation Buttons */}
           <div className="swiper-nav-buttons">
             <button 
-              onClick={() => {
-                const swiper = document.getElementById('servicesSwiper');
-                if (swiper) swiper.scrollBy({ left: -320, behavior: 'smooth' });
-              }}
+              onClick={prevService}
               className="swiper-nav-button text-gray-700 dark:text-gray-300"
               aria-label="Previous service"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button 
-              onClick={() => {
-                const swiper = document.getElementById('servicesSwiper');
-                if (swiper) swiper.scrollBy({ left: 320, behavior: 'smooth' });
-              }}
+              onClick={nextService}
               className="swiper-nav-button text-gray-700 dark:text-gray-300"
               aria-label="Next service"
             >
@@ -895,30 +1016,7 @@ function App() {
         </div>
       </section>
 
-      {/* Why Choose Us */}
-      <section className="py-20 scroll-mt-20 bg-white dark:bg-gray-900 transition-colors duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">Why Choose Us</h3>
-            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto transition-colors duration-300">
-              Your success is our priority. Here's what sets us apart
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {whyChooseUs.map((item, index) => (
-              <div key={index} className="text-center group">
-                <div className="bg-emerald-50 dark:bg-emerald-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/30 transition-colors">
-                  {item.icon}
-                </div>
-                <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">{item.title}</h4>
-                <p className="text-gray-600 dark:text-gray-400 transition-colors duration-300">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
+      {/* Testimonials */} 
       <section className="py-20 bg-gray-50 dark:bg-gray-800 scroll-mt-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -1044,10 +1142,11 @@ function App() {
                   </button>
                 </div>
               </div>
+
             </div>
           </div>
 
-          {/* Copyright */}
+          {/* Footer Bottom Text */}
           <div className="border-t border-gray-800 dark:border-gray-600 pt-8 text-center">
             <p className="text-gray-400 dark:text-gray-500 transition-colors duration-300">
               © 2024 Brytwin Homes & Construction Limited. All rights reserved.
@@ -1056,6 +1155,17 @@ function App() {
         </div>
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainApp />} />
+        <Route path="/about" element={<AboutUs />} />
+      </Routes>
+    </Router>
   );
 }
 
