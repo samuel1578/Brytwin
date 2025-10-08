@@ -5,13 +5,20 @@ import { useTheme } from '../contexts/ThemeContext';
 interface ThemeToggleProps {
   variant?: 'desktop' | 'mobile';
   className?: string;
+  onToggle?: () => void;
 }
 
 export const ThemeToggle: React.FC<ThemeToggleProps> = ({ 
   variant = 'desktop',
-  className = '' 
+  className = '',
+  onToggle
 }) => {
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
+
+  const handleToggle = () => {
+    toggleTheme();
+    onToggle?.();
+  };
 
   if (variant === 'mobile') {
     return (
@@ -36,7 +43,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
         
         {/* Toggle Switch */}
         <button
-          onClick={toggleTheme}
+          onClick={handleToggle}
           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ${
             isDark 
               ? 'bg-red-600' 
@@ -59,7 +66,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   // Desktop variant
   return (
     <button
-      onClick={toggleTheme}
+      onClick={handleToggle}
       className={`p-3 rounded-full border-2 transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ${
         isDark
           ? 'bg-gray-800 border-gray-600 text-yellow-400 hover:bg-gray-700'

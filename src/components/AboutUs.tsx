@@ -15,8 +15,12 @@ import {
   Instagram,
   Linkedin,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ArrowRight
 } from 'lucide-react';
+import constructionImg from '../construction.jpg';
+import estateImg from '../estate.jpg';
 import logo from '../logo.jpeg';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { useStaggeredInView } from '../hooks/useInView';
@@ -24,20 +28,26 @@ import { useSwipeable } from 'react-swipeable';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, EffectCards } from 'swiper/modules';
+import { EffectCards } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/effect-cards';
 
-// Replace with a more professional corporate/architectural image
+import deliveryImg from '../delivery.jpg';
+import investmentImg from '../investment.jpg';
 
-// Add these images to your project or replace with your own
-const founderBright = "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80";
-const founderWinifred = "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80";
+import founderBright from '../mr-bright.png';
+import founderWinifred from '../ms-win.jpeg';
 const patternLight = "https://assets.website-files.com/63904f663019b0d8edf8d57c/63915f9833eeee75f4917569_pattern-light.svg";
 const patternDark = "https://assets.website-files.com/63904f663019b0d8edf8d57c/63915f9833eeee4b73917568_pattern-dark.svg";
 
 const AboutUs: React.FC = () => {
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [swiper, setSwiper] = useState<any>(null);
   const navigate = useNavigate();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   
@@ -436,7 +446,7 @@ const AboutUs: React.FC = () => {
                   Book Now
                 </button>
 
-                <ThemeToggle variant="desktop" />
+                <ThemeToggle variant="desktop" onToggle={() => setIsMenuOpen(false)} />
               </div>
             </div>
 
@@ -559,7 +569,7 @@ const AboutUs: React.FC = () => {
                 {/* Theme Toggle */}
                 <div className="mt-8">
                   <h4 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide mb-3">Appearance</h4>
-                  <ThemeToggle variant="mobile" />
+                  <ThemeToggle variant="mobile" onToggle={() => setIsMenuOpen(false)} />
                 </div>
 
                 {/* CTA Section */}
@@ -710,67 +720,68 @@ const AboutUs: React.FC = () => {
             </p>
             
             {/* Founders Section - Glassmorphic Cards */}
-            <div className="flex flex-col md:flex-row justify-center gap-6 md:gap-10 mb-10 opacity-0 animate-slide-up-fade-in delay-400">
+            <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 dark:text-white mb-12 opacity-0 animate-slide-up-fade-in delay-300">
+              <span className="font-hurricane text-6xl md:text-7xl text-red-600 dark:text-red-400">Our Founders</span>
+            </h2>
+            <div className="flex flex-col md:flex-row justify-center gap-10 md:gap-16 mb-10 opacity-0 animate-slide-up-fade-in delay-400">
               {/* Mr. Bright */}
               <div 
-                className="glassmorphism rounded-2xl p-5 flex flex-col items-center transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="glassmorphism rounded-2xl p-6 flex flex-col items-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
                 style={{
                   transform: `perspective(1000px) rotateY(${(mousePosition.x - 0.5) * 10}deg) rotateX(${(mousePosition.y - 0.5) * -10}deg)`,
-                  transition: 'transform 0.2s ease-out'
+                  transition: 'all 0.3s ease-out'
                 }}
               >
-                <div className="relative w-24 h-24 mb-3">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-600 to-red-500 blur-lg opacity-70"></div>
+                <div className="relative w-64 h-80 mb-6">
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red-600 to-red-500 blur-2xl opacity-50"></div>
                   <img 
                     src={founderBright} 
                     alt="Mr. Bright" 
-                    className="w-full h-full object-cover rounded-full relative z-10 border-2 border-white dark:border-gray-800"
+                    className="w-full h-full object-cover rounded-2xl relative z-10 border-2 border-white dark:border-gray-800 shadow-lg"
                   />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Mr. Bright</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Founder & CEO</p>
-                <p className="text-xs mt-2 text-center text-gray-600 dark:text-gray-400">
-                  "Building tomorrow's landmarks with today's vision."
-                </p>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Mr. Bright Nana Nyarko Akrofi</h3>
+                  <p className="text-base text-red-600 dark:text-red-400 font-medium mb-3">Founder & CEO</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+                    "Building tomorrow's landmarks with today's vision."
+                  </p>
+                </div>
               </div>
               
               {/* Mrs. Winifred */}
               <div 
-                className="glassmorphism rounded-2xl p-5 flex flex-col items-center transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="glassmorphism rounded-2xl p-6 flex flex-col items-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
                 style={{
                   transform: `perspective(1000px) rotateY(${(mousePosition.x - 0.5) * 10}deg) rotateX(${(mousePosition.y - 0.5) * -10}deg)`,
-                  transition: 'transform 0.2s ease-out'
+                  transition: 'all 0.3s ease-out'
                 }}
               >
-                <div className="relative w-24 h-24 mb-3">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 blur-lg opacity-70"></div>
+                <div className="relative w-64 h-80 mb-6">
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 blur-2xl opacity-50"></div>
                   <img 
                     src={founderWinifred} 
                     alt="Mrs. Winifred" 
-                    className="w-full h-full object-cover rounded-full relative z-10 border-2 border-white dark:border-gray-800"
+                    className="w-full h-full object-cover rounded-2xl relative z-10 border-2 border-white dark:border-gray-800 shadow-lg"
                   />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Mrs. Winifred</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Co-Founder & COO</p>
-                <p className="text-xs mt-2 text-center text-gray-600 dark:text-gray-400">
-                  "Excellence in every detail, integrity in every project."
-                </p>
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Dr. Winifred Danso Agyemang</h3>
+                  <p className="text-base text-emerald-600 dark:text-emerald-400 font-medium mb-3">Co-Founder & COO</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 italic">
+                    "Excellence in every detail, integrity in every project."
+                  </p>
+                </div>
               </div>
             </div>
             
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row justify-center gap-4 md:gap-6 opacity-0 animate-slide-up-fade-in delay-500">
-              <button 
-                className="relative overflow-hidden group px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg font-bold shadow-lg transition-all duration-300"
-              >
-                <span className="relative z-10">Our Story</span>
-                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-red-700 to-red-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
-              </button>
               
               <button 
                 className="relative overflow-hidden group px-8 py-4 border-2 border-emerald-500 text-emerald-500 dark:text-emerald-400 dark:border-emerald-400 hover:text-white dark:hover:text-white rounded-lg font-bold transition-all duration-300"
               >
-                <span className="relative z-10">Our Projects</span>
+                <span className="relative z-10">Our Services</span>
                 <span className="absolute inset-0 w-full h-full bg-emerald-500 dark:bg-emerald-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
               </button>
             </div>
@@ -934,12 +945,9 @@ const AboutUs: React.FC = () => {
             <Swiper
               effect={'cards'}
               grabCursor={true}
-              modules={[Autoplay, EffectCards]}
+              modules={[EffectCards]}
               className="mySwiper"
-              autoplay={{
-                delay: 2000,
-                disableOnInteraction: false,
-              }}
+              onSwiper={(swiperInstance) => setSwiper(swiperInstance)}
               cardsEffect={{
                 perSlideOffset: 8,
                 perSlideRotate: 2,
@@ -949,62 +957,94 @@ const AboutUs: React.FC = () => {
             >
               {/* Hands-On Expertise */}
               <SwiperSlide>
-                <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg transition-all duration-300">
-                  <div className="text-4xl mb-6">🧱</div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
-                    Hands-On Expertise
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    Led by an active contractor who brings on-site experience to every decision.
-                  </p>
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg transition-all duration-300 overflow-hidden h-full relative">
+                  <img src={constructionImg} alt="Construction Expertise" className="w-full h-full object-cover absolute inset-0" />
+                  <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+                  <div className="p-8 relative z-10 h-full flex flex-col justify-end">
+                    <h3 className="text-2xl font-bold text-white mb-4 transition-colors">
+                      Hands-On Expertise
+                    </h3>
+                    <p className="text-gray-200 leading-relaxed">
+                      Led by an active contractor who brings on-site experience to every decision.
+                    </p>
+                  </div>
                 </div>
               </SwiperSlide>
 
               {/* Smart Investment & Strategy */}
               <SwiperSlide>
-                <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg transition-all duration-300">
-                  <div className="text-4xl mb-6">💼</div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
-                    Smart Investment & Strategy
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    Strong financial backing ensures smooth project execution and growth.
-                  </p>
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg transition-all duration-300 overflow-hidden h-full relative">
+                  <img src={estateImg} alt="Real Estate Investment" className="w-full h-full object-cover absolute inset-0" />
+                  <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+                  <div className="p-8 relative z-10 h-full flex flex-col justify-end">
+                    <h3 className="text-2xl font-bold text-white mb-4 transition-colors">
+                      Smart Investment & Strategy
+                    </h3>
+                    <p className="text-gray-200 leading-relaxed">
+                      Strong financial backing ensures smooth project execution and growth.
+                    </p>
+                  </div>
                 </div>
               </SwiperSlide>
 
               {/* On-Time Delivery */}
               <SwiperSlide>
-                <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg transition-all duration-300">
-                  <div className="text-4xl mb-6">🕒</div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
-                    On-Time Delivery
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    We prioritize deadlines without compromising quality.
-                  </p>
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg transition-all duration-300 overflow-hidden h-full relative">
+                  <img src={deliveryImg} alt="On-Time Delivery" className="w-full h-full object-cover absolute inset-0" />
+                  <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+                  <div className="p-8 relative z-10 h-full flex flex-col justify-end">
+                    <h3 className="text-2xl font-bold text-white mb-4 transition-colors">
+                      On-Time Delivery
+                    </h3>
+                    <p className="text-gray-200 leading-relaxed">
+                      We prioritize deadlines without compromising quality.
+                    </p>
+                  </div>
                 </div>
               </SwiperSlide>
 
-              {/* Community-Focused */}
+              {/* Smart Investment */}
               <SwiperSlide>
-                <div className="bg-white dark:bg-gray-900 p-8 rounded-xl shadow-lg transition-all duration-300">
-                  <div className="text-4xl mb-6">🌍</div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
-                    Community-Focused
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    We build with a vision that strengthens communities for generations.
-                  </p>
+                <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg transition-all duration-300 overflow-hidden h-full relative">
+                  <img src={investmentImg} alt="Smart Investment" className="w-full h-full object-cover absolute inset-0" />
+                  <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+                  <div className="p-8 relative z-10 h-full flex flex-col justify-end">
+                    <h3 className="text-2xl font-bold text-white mb-4 transition-colors">
+                      Smart Investment
+                    </h3>
+                    <p className="text-gray-200 leading-relaxed">
+                      We ensure your investments are secure and yield maximum returns.
+                    </p>
+                  </div>
                 </div>
               </SwiperSlide>
             </Swiper>
+
+            {/* Navigation Buttons */}
+            <div className="flex items-center justify-center gap-8 mt-12">
+              <button 
+                onClick={() => swiper?.slidePrev()}
+                className="group flex items-center gap-3 px-8 py-4 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors" />
+                <span className="font-hurricane text-3xl text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">Previous</span>
+              </button>
+              <button 
+                onClick={() => swiper?.slideNext()}
+                className="group flex items-center gap-3 px-8 py-4 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                aria-label="Next slide"
+              >
+                <span className="font-hurricane text-3xl text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">Next</span>
+                <ChevronRight className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Trust Building Section */}
-      <section className="py-20 bg-white dark:bg-gray-900 transition-colors duration-300">
+      <section className="pt-3 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-12 overflow-hidden">
             {/* Background Decorative Elements */}

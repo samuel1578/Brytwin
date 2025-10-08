@@ -34,11 +34,15 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { useInView, useStaggeredInView } from './hooks/useInView';
 
 function MainApp() {
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [heroSlide, setHeroSlide] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
   const [currentService, setCurrentService] = useState(0);
-  const [isServicesPaused, setIsServicesPaused] = useState(false);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [mobileHeroImage, setMobileHeroImage] = useState(1); // 1 for default, 2 for hero2
@@ -69,13 +73,6 @@ function MainApp() {
       description: "Comprehensive supply chain solutions for construction materials and specialized services.",
       color: "bg-emerald-600",
       image: goodsImg
-    },
-    {
-      icon: <Globe className="w-12 h-12 text-white" />,
-      title: "International Negotiation",
-      description: "Expert negotiation services for international property deals and construction contracts.",
-      color: "bg-red-600",
-      image: handshakeImg
     }
   ];
 
@@ -152,17 +149,6 @@ function MainApp() {
 
     return () => clearInterval(interval);
   }, [isPaused]);
-
-  // Auto-advance services carousel
-  useEffect(() => {
-    if (isServicesPaused) return;
-    
-    const interval = setInterval(() => {
-      setCurrentService(prev => (prev + 1) % services.length);
-    }, 5000); // Switch every 5 seconds
-
-    return () => clearInterval(interval);
-  }, [isServicesPaused, services.length]);
 
   // Navigation scroll state and mobile hero switch
   useEffect(() => {
@@ -620,7 +606,7 @@ function MainApp() {
                 </button>
 
                 {/* Theme Toggle */}
-                <ThemeToggle variant="desktop" />
+                <ThemeToggle variant="desktop" onToggle={() => setIsMenuOpen(false)} />
               </div>
             </div>
 
@@ -739,7 +725,7 @@ function MainApp() {
                 {/* Theme Toggle */}
                 <div className="mt-8">
                   <h4 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wide mb-3">Appearance</h4>
-                  <ThemeToggle variant="mobile" />
+                  <ThemeToggle variant="mobile" onToggle={() => setIsMenuOpen(false)} />
                 </div>
 
                 {/* CTA Section */}
@@ -899,8 +885,6 @@ function MainApp() {
           {/* Services Coverflow */}
           <div 
             className="services-coverflow"
-            onMouseEnter={() => setIsServicesPaused(true)}
-            onMouseLeave={() => setIsServicesPaused(false)}
             onTouchStart={handleTouchStart} 
             onTouchMove={handleTouchMove} 
             onTouchEnd={handleTouchEnd}
@@ -947,20 +931,22 @@ function MainApp() {
           </div>
           
           {/* Navigation Buttons */}
-          <div className="swiper-nav-buttons">
+          <div className="swiper-nav-buttons flex items-center gap-6">
             <button 
               onClick={prevService}
-              className="swiper-nav-button text-gray-700 dark:text-gray-300"
+              className="group flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
               aria-label="Previous service"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors" />
+              <span className="font-hurricane text-3xl text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">Previous</span>
             </button>
             <button 
               onClick={nextService}
-              className="swiper-nav-button text-gray-700 dark:text-gray-300"
+              className="group flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
               aria-label="Next service"
             >
-              <ChevronRight className="w-5 h-5" />
+              <span className="font-hurricane text-3xl text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">Next</span>
+              <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors" />
             </button>
           </div>
         </div>
