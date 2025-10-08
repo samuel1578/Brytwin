@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import AboutUs from './components/AboutUs';
+import Services from './pages/Services';
+import Properties from './pages/Properties';
 import { 
   Menu, 
   X, 
@@ -583,11 +585,15 @@ function MainApp() {
                   About Us
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/Services" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a 
+                  href="/services" 
+                  onClick={e => {e.preventDefault(); navigate('/services');}} 
+                  className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                >
                   Services
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="#properties" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/properties" onClick={e => {e.preventDefault(); navigate('/properties');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Properties
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
@@ -689,16 +695,24 @@ function MainApp() {
                     About Us
                   </a>
                   <a 
-                    href="#services" 
-                    onClick={toggleMenu}
+                    href="/services" 
+                    onClick={e => {
+                      e.preventDefault();
+                      toggleMenu();
+                      navigate('/services');
+                    }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Building className="w-5 h-5 mr-4" />
                     Services
                   </a>
                   <a 
-                    href="#properties" 
-                    onClick={toggleMenu}
+                    href="/properties" 
+                    onClick={e => {
+                      e.preventDefault();
+                      toggleMenu();
+                      navigate('/properties');
+                    }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Home className="w-5 h-5 mr-4" />
@@ -1091,7 +1105,7 @@ function MainApp() {
                 <li><a href="#home" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Home</a></li>
                 <li><a href="#about" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">About Us</a></li>
                 <li><a href="#services" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Services</a></li>
-                <li><a href="#properties" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
+                <li><a href="/properties" onClick={e => {e.preventDefault(); navigate('/properties');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
                 <li><a href="#gallery" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Gallery</a></li>
               </ul>
             </div>
@@ -1150,6 +1164,8 @@ function App() {
       <Routes>
         <Route path="/" element={<MainApp />} />
         <Route path="/about" element={<AboutUs />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/properties" element={<Properties />} />
       </Routes>
     </Router>
   );

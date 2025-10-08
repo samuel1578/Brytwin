@@ -425,7 +425,11 @@ const AboutUs: React.FC = () => {
                   About Us
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/#services" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a 
+                  href="/services" 
+                  onClick={e => {e.preventDefault(); navigate('/services');}} 
+                  className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                >
                   Services
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
@@ -533,8 +537,12 @@ const AboutUs: React.FC = () => {
                     About Us
                   </a>
                   <a 
-                    href="#services" 
-                    onClick={toggleMenu}
+                    href="/services" 
+                    onClick={e => {
+                      e.preventDefault();
+                      toggleMenu();
+                      navigate('/services');
+                    }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Building className="w-5 h-5 mr-4" />
