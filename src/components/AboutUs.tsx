@@ -777,7 +777,10 @@ const AboutUs: React.FC = () => {
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Dr. Winifred Danso Agyemang</h3>
                   <p className="text-base text-emerald-600 dark:text-emerald-400 font-medium mb-3">Co-Founder & COO</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-                    "Excellence in every detail, integrity in every project."
+                    "Adventured in the construction industry with her son to build a company with her Business Management Degree. She complimented Mr. Bright with her experience in helping the business come together. 
+
+Dr. Winifred Danso Agyemang has worked with companies in the United States in Solar,  Home Construction, and Property Security. 
+The family has an unwavering determination to help many people build the home or structure of their dreams."
                   </p>
                 </div>
               </div>
