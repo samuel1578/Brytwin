@@ -13,7 +13,9 @@ import {
   Facebook,
   Twitter,
   Instagram,
-  Linkedin
+  Linkedin,
+  Bed,
+  Bath
 } from 'lucide-react';
 import logo from '../logo.jpeg';
 import { ThemeToggle } from '../components/ThemeToggle';
@@ -48,7 +50,41 @@ const Properties: React.FC = () => {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  // Helper function to convert Google Drive URLs to direct image URLs
+  // Helper function to check if URL is a video
+  const isVideoUrl = (url: string): boolean => {
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+    const lowerUrl = url.toLowerCase();
+    return videoExtensions.some(ext => lowerUrl.includes(ext)) || 
+           (url.includes('drive.google.com') && url.includes('/file/d/'));
+  };
+
+  // Helper function to get video thumbnail from Google Drive
+  const getVideoThumbnail = (url: string): string | null => {
+    try {
+      if (url.includes('drive.google.com')) {
+        let fileId = '';
+        
+        if (url.includes('uc?id=')) {
+          fileId = url.split('uc?id=')[1].split('&')[0];
+        } else if (url.includes('/file/d/')) {
+          fileId = url.split('/file/d/')[1].split('/')[0];
+        } else if (url.includes('open?id=')) {
+          fileId = url.split('open?id=')[1].split('&')[0];
+        }
+
+        // Return Google Drive video thumbnail URL
+        if (fileId) {
+          return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting video thumbnail:', error);
+      return null;
+    }
+  };
+
+  // Helper function to convert Google Drive URLs to direct image/video URLs
   const convertGoogleDriveUrl = (url: string): string => {
     try {
       // Check if it's a Google Drive URL
@@ -69,8 +105,12 @@ const Properties: React.FC = () => {
           fileId = url.split('open?id=')[1].split('&')[0];
         }
 
-        // Convert to direct thumbnail URL that works in img tags
-        if (fileId) {
+        // For videos, use embed format
+        if (fileId && isVideoUrl(url)) {
+          return `https://drive.google.com/file/d/${fileId}/preview`;
+        }
+        // For images, convert to direct thumbnail URL that works in img tags
+        else if (fileId) {
           return `https://lh3.googleusercontent.com/d/${fileId}=w2000-h2000`;
         }
       }
@@ -484,18 +524,30 @@ const Properties: React.FC = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {properties.map((property, index) => {
-              // Get exterior images for placeholder
+              // Get exterior images/videos for placeholder
               const exteriorImageString = property['Exterior Images']?.toString() || '';
-              const exteriorImages = exteriorImageString
+              const exteriorUrls = exteriorImageString
                 .split(',')
                 .map((url: string) => url.replace(/\n/g, '').trim())
-                .filter((url: string) => url && url.length > 0)
-                .map((url: string) => convertGoogleDriveUrl(url));
+                .filter((url: string) => url && url.length > 0);
               
-              // Get a random exterior image or use first one
-              const placeholderImage = exteriorImages.length > 0 
-                ? exteriorImages[Math.floor(Math.random() * exteriorImages.length)]
-                : null;
+              // Separate videos and images
+              const videoUrls = exteriorUrls.filter((url: string) => isVideoUrl(url));
+              const imageUrls = exteriorUrls.filter((url: string) => !isVideoUrl(url));
+              
+              // Determine placeholder: use video thumbnail if video exists, otherwise use image
+              let placeholderImage = null;
+              
+              if (videoUrls.length > 0) {
+                // Use video thumbnail
+                const randomVideo = videoUrls[Math.floor(Math.random() * videoUrls.length)];
+                placeholderImage = getVideoThumbnail(randomVideo);
+                console.log('Video detected:', randomVideo, 'Thumbnail:', placeholderImage);
+              } else if (imageUrls.length > 0) {
+                // Use regular image
+                const convertedImages = imageUrls.map((url: string) => convertGoogleDriveUrl(url));
+                placeholderImage = convertedImages[Math.floor(Math.random() * convertedImages.length)];
+              }
 
               return (
                 <div
@@ -504,17 +556,28 @@ const Properties: React.FC = () => {
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
                   {/* Placeholder Image */}
-                  {placeholderImage && (
-                    <div className="w-full h-64 overflow-hidden">
+                  {placeholderImage ? (
+                    <div className="w-full h-64 overflow-hidden bg-gray-200 dark:bg-gray-700">
                       <img
                         src={placeholderImage}
                         alt={property.Title}
                         className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
                         onError={(e) => {
-                          console.error('Failed to load image:', placeholderImage);
-                          (e.target as HTMLImageElement).style.display = 'none';
+                          console.error('Failed to load placeholder:', placeholderImage);
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          // Show a fallback background
+                          if (target.parentElement) {
+                            target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-500"><svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path></svg></div>';
+                          }
                         }}
                       />
+                    </div>
+                  ) : (
+                    <div className="w-full h-64 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                      <svg className="w-16 h-16 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd"></path>
+                      </svg>
                     </div>
                   )}
 
@@ -529,6 +592,23 @@ const Properties: React.FC = () => {
                     <p className="text-2xl font-semibold text-red-600 dark:text-red-400 mb-4">
                       {property.Currency} {property.Price}
                     </p>
+
+                    {/* Bedrooms and Bathrooms */}
+                    <div className="flex items-center gap-6 mb-4">
+                      <div className="flex items-center gap-2">
+                        <Bed className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                        <span className="text-gray-700 dark:text-gray-300">
+                          Bedrooms: <span className="font-bold text-gray-900 dark:text-white">{property.Bedrooms}</span>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Bath className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                        <span className="text-gray-700 dark:text-gray-300">
+                          Bathrooms: <span className="font-bold text-gray-900 dark:text-white">{property.Bathrooms}</span>
+                        </span>
+                      </div>
+                    </div>
+
                     <p className="text-gray-700 dark:text-gray-300 mb-4">
                       {property.Description}
                     </p>
@@ -550,6 +630,25 @@ const Properties: React.FC = () => {
         </div>
       </section>
 
+      {/* Acquisition Guide Section */}
+      <section className="py-16 bg-gray-100 dark:bg-gray-800 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-8 text-gray-900 dark:text-white">How to Acquire a Property</h2>
+          <ol className="list-decimal list-inside space-y-4 text-gray-700 dark:text-gray-300">
+            <li>Browse Listings: Explore our available properties and select the ones matching your needs.</li>
+            <li>Contact the Broker: Click "View All Photos" on your chosen property, then reach out to our broker to schedule a viewing.</li>
+            <li>Site Visit & Inspection: Attend the property visit, inspect conditions, and verify compliance with building regulations.</li>
+            <li>Submit an Offer: Make a formal offer based on current market valuations and negotiate terms.</li>
+            <li>Due Diligence: Perform legal review, secure financing, and conduct property valuation.</li>
+            <li>Finalize Agreement: Sign the sales contract, settle taxes and fees, and complete the transfer of ownership.</li>
+            <li>Move In: Receive the keys and start enjoying your new home or investment.</li>
+          </ol>
+          <p className="mt-8 text-sm text-gray-500 dark:text-gray-400 italic">
+            Note: Transactions are subject to market conditions, regulatory approvals, and applicable fees. Please consult licensed professionals for complete guidance.
+          </p>
+        </div>
+      </section>
+
       {/* Image Slideshow Modal */}
       {selectedProperty && (
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
@@ -566,48 +665,61 @@ const Properties: React.FC = () => {
                 return imageString
                   .split(',')
                   .map((url: string) => url.replace(/\n/g, '').trim())
-                  .filter((url: string) => url && url.length > 0)
-                  .map((url: string) => convertGoogleDriveUrl(url));
+                  .filter((url: string) => url && url.length > 0);
               };
 
-              const allImages = [
+              const allMedia = [
                 ...parseImages(selectedProperty['Exterior Images'] || ''),
                 ...parseImages(selectedProperty['Bedroom Images'] || ''),
                 ...parseImages(selectedProperty['Bathroom Images'] || ''),
                 ...parseImages(selectedProperty['Livingroom Images'] || '')
               ];
 
-              if (allImages.length === 0) return null;
+              if (allMedia.length === 0) return null;
+
+              const currentUrl = allMedia[currentImageIndex];
+              const convertedUrl = convertGoogleDriveUrl(currentUrl);
+              const isVideo = isVideoUrl(currentUrl);
 
               return (
                 <div className="relative">
-                  <img
-                    src={allImages[currentImageIndex]}
-                    alt={`Property image ${currentImageIndex + 1}`}
-                    className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
-                    onError={(e) => {
-                      console.error('Failed to load image:', allImages[currentImageIndex]);
-                      (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTAwSDIyNVYxNTBIMTc1VjEwMFoiIGZpbGw9IiM5Q0E0QUYiLz4KPHA+PGZpbGw9IiM2QjczODAiPkltYWdlIG5vdCBhdmFpbGFibGU8L2ZpbGw+PC9wPgo8L3N2Zz4K';
-                    }}
-                  />
-                  {allImages.length > 1 && (
+                  {isVideo ? (
+                    <iframe
+                      src={convertedUrl}
+                      className="w-full h-auto max-h-[80vh] rounded-lg"
+                      style={{ aspectRatio: '16/9', minHeight: '400px' }}
+                      allow="autoplay"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <img
+                      src={convertedUrl}
+                      alt={`Property media ${currentImageIndex + 1}`}
+                      className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+                      onError={(e) => {
+                        console.error('Failed to load image:', convertedUrl);
+                        (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTAwSDIyNVYxNTBIMTc1VjEwMFoiIGZpbGw9IiM5Q0E0QUYiLz4KPHA+PGZpbGw9IiM2QjczODAiPkltYWdlIG5vdCBhdmFpbGFibGU8L2ZpbGw+PC9wPgo8L3N2Zz4K';
+                      }}
+                    />
+                  )}
+                  {allMedia.length > 1 && (
                     <>
                       <button
-                        onClick={() => setCurrentImageIndex((currentImageIndex - 1 + allImages.length) % allImages.length)}
-                        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center"
+                        onClick={() => setCurrentImageIndex((currentImageIndex - 1 + allMedia.length) % allMedia.length)}
+                        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center z-10"
                       >
                         &#8249;
                       </button>
                       <button
-                        onClick={() => setCurrentImageIndex((currentImageIndex + 1) % allImages.length)}
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center"
+                        onClick={() => setCurrentImageIndex((currentImageIndex + 1) % allMedia.length)}
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center z-10"
                       >
                         &#8250;
                       </button>
                     </>
                   )}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm bg-black bg-opacity-50 px-3 py-1 rounded-full">
-                    {currentImageIndex + 1} / {allImages.length}
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm bg-black bg-opacity-50 px-3 py-1 rounded-full z-10">
+                    {currentImageIndex + 1} / {allMedia.length} {isVideo && '(Video)'}
                   </div>
                 </div>
               );
