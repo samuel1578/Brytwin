@@ -18,6 +18,22 @@ import {
 import logo from '../logo.jpeg';
 import { ThemeToggle } from '../components/ThemeToggle';
 
+interface Property {
+  ID: string;
+  Title: string;
+  Location: string;
+  Price: string;
+  Currency: string;
+  Bedrooms: string;
+  Bathrooms: string;
+  Description: string;
+  'Exterior Images': string;
+  'Bedroom Images': string;
+  'Bathroom Images': string;
+  'Livingroom Images': string;
+  Status: string;
+}
+
 const Properties: React.FC = () => {
   // Scroll to top when component mounts
   useEffect(() => {
@@ -25,9 +41,52 @@ const Properties: React.FC = () => {
   }, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  // Helper function to convert Google Drive URLs to direct image URLs
+  const convertGoogleDriveUrl = (url: string): string => {
+    try {
+      // Check if it's a Google Drive URL
+      if (url.includes('drive.google.com')) {
+        // Extract file ID from various Google Drive URL formats
+        let fileId = '';
+        
+        // Format: https://drive.google.com/uc?id=FILE_ID
+        if (url.includes('uc?id=')) {
+          fileId = url.split('uc?id=')[1].split('&')[0];
+        }
+        // Format: https://drive.google.com/file/d/FILE_ID/view
+        else if (url.includes('/file/d/')) {
+          fileId = url.split('/file/d/')[1].split('/')[0];
+        }
+        // Format: https://drive.google.com/open?id=FILE_ID
+        else if (url.includes('open?id=')) {
+          fileId = url.split('open?id=')[1].split('&')[0];
+        }
+
+        // Convert to direct thumbnail URL that works in img tags
+        if (fileId) {
+          return `https://lh3.googleusercontent.com/d/${fileId}=w2000-h2000`;
+        }
+      }
+      return url;
+    } catch (error) {
+      console.error('Error converting Google Drive URL:', error);
+      return url;
+    }
+  };
+
+  useEffect(() => {
+    fetch('https://opensheet.elk.sh/1UK0qYeCVkeoAc7WhQz2kDi9PUd1L2VKt9MGXN6wZQRM/Properties')
+      .then(res => res.json())
+      .then((data: Property[]) => setProperties(data))
+      .catch(err => console.error('Error fetching properties:', err));
+  }, []);
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 relative transition-colors duration-300">
@@ -398,7 +457,7 @@ const Properties: React.FC = () => {
       </nav>
 
       {/* Placeholder Hero Section */}
-      <section className="relative flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 pt-20 min-h-screen">
+      <section className="relative flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 pt-20 h-[50vh]">
         <div className="text-center text-gray-900 dark:text-white max-w-4xl mx-auto px-4 animate-fade-in-up">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-slide-up">
             Our Properties
@@ -416,6 +475,146 @@ const Properties: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Properties Section */}
+      <section className="py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white animate-fade-in-up">
+            Available Properties
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {properties.map((property, index) => {
+              // Get exterior images for placeholder
+              const exteriorImageString = property['Exterior Images']?.toString() || '';
+              const exteriorImages = exteriorImageString
+                .split(',')
+                .map((url: string) => url.replace(/\n/g, '').trim())
+                .filter((url: string) => url && url.length > 0)
+                .map((url: string) => convertGoogleDriveUrl(url));
+              
+              // Get a random exterior image or use first one
+              const placeholderImage = exteriorImages.length > 0 
+                ? exteriorImages[Math.floor(Math.random() * exteriorImages.length)]
+                : null;
+
+              return (
+                <div
+                  key={property.ID}
+                  className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  {/* Placeholder Image */}
+                  {placeholderImage && (
+                    <div className="w-full h-64 overflow-hidden">
+                      <img
+                        src={placeholderImage}
+                        alt={property.Title}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                        onError={(e) => {
+                          console.error('Failed to load image:', placeholderImage);
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                      {property.Title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-2 flex items-center">
+                      <MapPin className="w-4 h-4 mr-2 text-red-600 dark:text-red-400" />
+                      {property.Location}
+                    </p>
+                    <p className="text-2xl font-semibold text-red-600 dark:text-red-400 mb-4">
+                      {property.Currency} {property.Price}
+                    </p>
+                    <p className="text-gray-700 dark:text-gray-300 mb-4">
+                      {property.Description}
+                    </p>
+
+                    <button
+                      onClick={() => {
+                        setSelectedProperty(property);
+                        setCurrentImageIndex(0);
+                      }}
+                      className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg mt-4 transition-colors font-semibold"
+                    >
+                      View All Photos
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Image Slideshow Modal */}
+      {selectedProperty && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-4xl w-full max-h-full">
+            <button
+              onClick={() => setSelectedProperty(null)}
+              className="absolute -top-12 right-0 text-white text-2xl hover:text-gray-300 transition-colors z-10"
+            >
+              &times;
+            </button>
+
+            {(() => {
+              const parseImages = (imageString: string) => {
+                return imageString
+                  .split(',')
+                  .map((url: string) => url.replace(/\n/g, '').trim())
+                  .filter((url: string) => url && url.length > 0)
+                  .map((url: string) => convertGoogleDriveUrl(url));
+              };
+
+              const allImages = [
+                ...parseImages(selectedProperty['Exterior Images'] || ''),
+                ...parseImages(selectedProperty['Bedroom Images'] || ''),
+                ...parseImages(selectedProperty['Bathroom Images'] || ''),
+                ...parseImages(selectedProperty['Livingroom Images'] || '')
+              ];
+
+              if (allImages.length === 0) return null;
+
+              return (
+                <div className="relative">
+                  <img
+                    src={allImages[currentImageIndex]}
+                    alt={`Property image ${currentImageIndex + 1}`}
+                    className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
+                    onError={(e) => {
+                      console.error('Failed to load image:', allImages[currentImageIndex]);
+                      (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTAwSDIyNVYxNTBIMTc1VjEwMFoiIGZpbGw9IiM5Q0E0QUYiLz4KPHA+PGZpbGw9IiM2QjczODAiPkltYWdlIG5vdCBhdmFpbGFibGU8L2ZpbGw+PC9wPgo8L3N2Zz4K';
+                    }}
+                  />
+                  {allImages.length > 1 && (
+                    <>
+                      <button
+                        onClick={() => setCurrentImageIndex((currentImageIndex - 1 + allImages.length) % allImages.length)}
+                        className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center"
+                      >
+                        &#8249;
+                      </button>
+                      <button
+                        onClick={() => setCurrentImageIndex((currentImageIndex + 1) % allImages.length)}
+                        className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-3xl hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full w-12 h-12 flex items-center justify-center"
+                      >
+                        &#8250;
+                      </button>
+                    </>
+                  )}
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm bg-black bg-opacity-50 px-3 py-1 rounded-full">
+                    {currentImageIndex + 1} / {allImages.length}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer id="contact" className="bg-gray-900 dark:bg-gray-950 text-white py-16 scroll-mt-20 transition-colors duration-300">
