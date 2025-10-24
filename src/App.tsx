@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Link } from 'react-router-dom';
 import AboutUs from './components/AboutUs';
 import Services from './pages/Services';
 import Properties from './pages/Properties';
@@ -10,10 +10,7 @@ import {
   Mail, 
   MapPin, 
   Star,
-  Shield,
-  Award,
   Users,
-  CheckCircle,
   Home,
   Building,
   Truck,
@@ -24,16 +21,33 @@ import {
   Facebook,
   Twitter,
   Instagram,
-  Linkedin
+  Linkedin,
+  Bed,
+  Bath
 } from 'lucide-react';
 import logo from './logo.jpeg';
 import hero2Img from './hero2.jpg';
 import estateImg from './estate.jpg';
 import constructionImg from './construction.jpg';
 import goodsImg from './goods.jpg';
-import handshakeImg from './handshake.jpg';
 import { ThemeToggle } from './components/ThemeToggle';
 import { useInView, useStaggeredInView } from './hooks/useInView';
+
+interface Property {
+  ID: string;
+  Title: string;
+  Location: string;
+  Price: string;
+  Currency: string;
+  Bedrooms: string;
+  Bathrooms: string;
+  Description: string;
+  'Exterior Images': string;
+  'Bedroom Images': string;
+  'Bathroom Images': string;
+  'Livingroom Images': string;
+  Status: string;
+}
 
 function MainApp() {
   // Scroll to top when component mounts
@@ -51,8 +65,422 @@ function MainApp() {
   const [lastScrollY, setLastScrollY] = useState(0);
   const [hasScrolledPastHero, setHasScrolledPastHero] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
+  const [savedScrollPosition, setSavedScrollPosition] = useState(0);
+
+  // Effect to handle body scroll lock when modal is open
+  useEffect(() => {
+    if (isConsultationModalOpen) {
+      // Save current scroll position and add styles to prevent scrolling
+      const scrollY = window.scrollY;
+      setSavedScrollPosition(scrollY);
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+    } else {
+      // Restore scroll position when modal is closed
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, savedScrollPosition);
+    }
+  }, [isConsultationModalOpen, savedScrollPosition]);
+
+  // Modified modal state handler to properly manage scroll lock
+  const handleModalToggle = (open: boolean) => {
+    setIsConsultationModalOpen(open);
+  };
 
   const navigate = useNavigate();
+
+  // Style for the consultation modal
+  const consultationModalStyle = `
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+    .consultation-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(20, 20, 20, 0.9) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      max-height: 100vh;
+      overflow-y: auto;
+    }
+
+    .consultation-modal.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.95) 100%);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      padding: 3rem;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+      transform: translateX(-100%) scale(0.9);
+      opacity: 0;
+      transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin: 2rem auto;
+      min-height: calc(100vh - 4rem);
+    }
+
+    .consultation-modal.open .modal-content {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+
+    .dark .modal-content {
+      background: linear-gradient(145deg, rgba(17, 24, 39, 0.98) 0%, rgba(31, 41, 55, 0.95) 100%);
+      box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #dc2626 0%, #059669 50%, #dc2626 100%);
+      border-radius: 24px 24px 0 0;
+    }
+
+    .consultation-modal h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 1rem;
+      text-align: center;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+    }
+
+    .dark .consultation-modal h2 {
+      color: #f9fafb;
+    }
+
+    .consultation-modal p {
+      font-family: 'Inter', sans-serif;
+      font-size: 1.125rem;
+      font-weight: 400;
+      color: #6b7280;
+      margin-bottom: 2rem;
+      text-align: center;
+      line-height: 1.6;
+      letter-spacing: 0.01em;
+    }
+
+    .dark .consultation-modal p {
+      color: #9ca3af;
+    }
+
+    .consultation-modal input,
+    .consultation-modal select,
+    .consultation-modal textarea {
+      font-family: 'Inter', sans-serif;
+      width: 100%;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      border: 2px solid rgba(229, 231, 235, 0.8);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      color: #1f2937;
+      font-size: 1rem;
+      font-weight: 400;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .consultation-modal input:focus,
+    .consultation-modal select:focus,
+    .consultation-modal textarea:focus {
+      border-color: #dc2626;
+      box-shadow:
+        0 0 0 3px rgba(220, 38, 38, 0.1),
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      background: rgba(255, 255, 255, 1);
+      transform: translateY(-1px);
+    }
+
+    .dark .consultation-modal input,
+    .dark .consultation-modal select,
+    .dark .consultation-modal textarea {
+      background: rgba(31, 41, 55, 0.9);
+      border-color: rgba(75, 85, 99, 0.8);
+      color: #f9fafb;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark .consultation-modal input:focus,
+    .dark .consultation-modal select:focus,
+    .dark .consultation-modal textarea:focus {
+      border-color: #dc2626;
+      background: rgba(31, 41, 55, 1);
+      box-shadow:
+        0 0 0 3px rgba(220, 38, 38, 0.2),
+        0 10px 15px -3px rgba(0, 0, 0, 0.3),
+        0 4px 6px -2px rgba(0, 0, 0, 0.15);
+    }
+
+    .consultation-modal input::placeholder,
+    .consultation-modal select::placeholder,
+    .consultation-modal textarea::placeholder {
+      color: #9ca3af;
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .dark .consultation-modal input::placeholder,
+    .dark .consultation-modal select::placeholder,
+    .dark .consultation-modal textarea::placeholder {
+      color: #6b7280;
+    }
+
+    .consultation-modal .buttons {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+      justify-content: center;
+    }
+
+    .consultation-modal .btn-primary {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+      color: white;
+      padding: 1rem 2.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1.125rem;
+      letter-spacing: 0.025em;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.3), 0 4px 6px -2px rgba(220, 38, 38, 0.2);
+      border: none;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .consultation-modal .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .consultation-modal .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .consultation-modal .btn-primary:hover {
+      background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(220, 38, 38, 0.4), 0 10px 10px -5px rgba(220, 38, 38, 0.3);
+    }
+
+    .consultation-modal .btn-secondary {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, rgba(229, 231, 235, 0.9) 0%, rgba(209, 213, 219, 0.8) 100%);
+      color: #374151;
+      padding: 1rem 2.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1.125rem;
+      letter-spacing: 0.025em;
+      transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 2px solid rgba(156, 163, 175, 0.3);
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .consultation-modal .btn-secondary:hover {
+      background: linear-gradient(135deg, rgba(209, 213, 219, 1) 0%, rgba(156, 163, 175, 0.9) 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark .consultation-modal .btn-secondary {
+      background: linear-gradient(135deg, rgba(75, 85, 99, 0.9) 0%, rgba(55, 65, 81, 0.8) 100%);
+      color: #f9fafb;
+      border-color: rgba(107, 114, 128, 0.5);
+    }
+
+    .dark .consultation-modal .btn-secondary:hover {
+      background: linear-gradient(135deg, rgba(55, 65, 81, 1) 0%, rgba(75, 85, 99, 0.9) 100%);
+    }
+
+    /* Elegant form labels */
+    .consultation-modal .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .consultation-modal .form-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0.5rem;
+      display: block;
+      letter-spacing: 0.025em;
+    }
+
+    .dark .consultation-modal .form-label {
+      color: #e5e7eb;
+    }
+
+    /* Responsive design */
+    @media (max-width: 640px) {
+      .modal-content {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+        max-width: none;
+        min-height: calc(100vh - 2rem);
+      }
+
+      .consultation-modal h2 {
+        font-size: 2rem;
+      }
+
+      .consultation-modal .buttons {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .consultation-modal .btn-primary,
+      .consultation-modal .btn-secondary {
+        width: 100%;
+        padding: 1rem 2rem;
+      }
+    }
+
+    /* Elegant loading animation */
+    @keyframes shimmer {
+      0% { background-position: -200px 0; }
+      100% { background-position: calc(200px + 100%) 0; }
+    }
+
+    .consultation-modal .btn-loading {
+      background: linear-gradient(90deg, #f0f0f0 0px, #e0e0e0 40px, #f0f0f0 80px);
+      background-size: 200px;
+      animation: shimmer 1.5s infinite linear;
+    }
+
+    .dark .consultation-modal .btn-loading {
+      background: linear-gradient(90deg, #374151 0px, #4b5563 40px, #374151 80px);
+      background-size: 200px;
+    }
+  `;
+
+  // Helper function to check if URL is a video
+  const isVideoUrl = (url: string): boolean => {
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+    const lowerUrl = url.toLowerCase();
+    return videoExtensions.some(ext => lowerUrl.includes(ext)) || 
+           (url.includes('drive.google.com') && url.includes('/file/d/'));
+  };
+
+  // Helper function to get video thumbnail from Google Drive
+  const getVideoThumbnail = (url: string): string | null => {
+    try {
+      if (url.includes('drive.google.com')) {
+        let fileId = '';
+        
+        if (url.includes('uc?id=')) {
+          fileId = url.split('uc?id=')[1].split('&')[0];
+        } else if (url.includes('/file/d/')) {
+          fileId = url.split('/file/d/')[1].split('/')[0];
+        } else if (url.includes('open?id=')) {
+          fileId = url.split('open?id=')[1].split('&')[0];
+        }
+
+        // Return Google Drive video thumbnail URL
+        if (fileId) {
+          return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting video thumbnail:', error);
+      return null;
+    }
+  };
+
+  // Helper function to convert Google Drive URLs to direct image/video URLs
+  const convertGoogleDriveUrl = (url: string): string => {
+    try {
+      // Check if it's a Google Drive URL
+      if (url.includes('drive.google.com')) {
+        // Extract file ID from various Google Drive URL formats
+        let fileId = '';
+        
+        // Format: https://drive.google.com/uc?id=FILE_ID
+        if (url.includes('uc?id=')) {
+          fileId = url.split('uc?id=')[1].split('&')[0];
+        }
+        // Format: https://drive.google.com/file/d/FILE_ID/view
+        else if (url.includes('/file/d/')) {
+          fileId = url.split('/file/d/')[1].split('/')[0];
+        }
+        // Format: https://drive.google.com/open?id=FILE_ID
+        else if (url.includes('open?id=')) {
+          fileId = url.split('open?id=')[1].split('&')[0];
+        }
+
+        // For videos, use embed format
+        if (fileId && isVideoUrl(url)) {
+          return `https://drive.google.com/file/d/${fileId}/preview`;
+        }
+        // For images, convert to direct thumbnail URL that works in img tags
+        else if (fileId) {
+          return `https://lh3.googleusercontent.com/d/${fileId}=w2000-h2000`;
+        }
+      }
+      return url;
+    } catch (error) {
+      console.error('Error converting Google Drive URL:', error);
+      return url;
+    }
+  };
+
+  useEffect(() => {
+    fetch('https://opensheet.elk.sh/1UK0qYeCVkeoAc7WhQz2kDi9PUd1L2VKt9MGXN6wZQRM/Properties')
+      .then(res => res.json())
+      .then((data: Property[]) => setProperties(data))
+      .catch(err => console.error('Error fetching properties:', err));
+  }, []);
 
   const services = [
     {
@@ -199,51 +627,21 @@ function MainApp() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY, hasScrolledPastHero, mobileHeroImage, isScrolled]);
 
-  const properties = [
-    {
-      image: "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800",
-      title: "Luxury Villa Estate",
-      price: "$2,500,000",
-      location: "Prime Location",
-      beds: 5,
-      baths: 4,
-      area: "4,200 sq ft"
-    },
-    {
-      image: "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800",
-      title: "Modern Family Home",
-      price: "$1,850,000",
-      location: "Residential Area",
-      beds: 4,
-      baths: 3,
-      area: "3,500 sq ft"
-    },
-    {
-      image: "https://images.pexels.com/photos/323780/pexels-photo-323780.jpeg?auto=compress&cs=tinysrgb&w=800",
-      title: "Executive Townhouse",
-      price: "$1,200,000",
-      location: "City Center",
-      beds: 3,
-      baths: 2.5,
-      area: "2,800 sq ft"
-    }
-  ];
-
   const testimonials = [
     {
-      name: "Sarah Johnson",
+      name: "Samuel Dzokoto",
       role: "Property Investor",
       content: "Brytwin Homes delivered exceptional service throughout our property acquisition. Their international negotiation expertise saved us significant costs.",
       rating: 5
     },
     {
-      name: "Michael Chen",
-      role: "Homeowner",
+      name: "Mr. and Mrs. Kumevor",
+      role: "Homeowners",
       content: "The construction quality exceeded our expectations. Professional team, on-time delivery, and outstanding attention to detail.",
       rating: 5
     },
     {
-      name: "Emma Williams",
+      name: "Mr George Okine",
       role: "Business Owner",
       content: "Their estate management services have been invaluable for our commercial properties. Highly recommend their expertise.",
       rating: 5
@@ -607,7 +1005,10 @@ function MainApp() {
                 </a>
                 
                 {/* CTA Button */}
-                <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                <button 
+                  onClick={() => handleModalToggle(true)}
+                  className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                >
                   Book Now
                 </button>
 
@@ -747,7 +1148,10 @@ function MainApp() {
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Ready to Get Started?</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">Book a consultation and let's discuss your project.</p>
                   <button 
-                    onClick={toggleMenu}
+                    onClick={() => {
+                      toggleMenu();
+                      handleModalToggle(true);
+                    }}
                     className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-4 rounded-xl text-base font-bold uppercase tracking-wide shadow-lg transition-all duration-200"
                   >
                     Book Now
@@ -790,6 +1194,101 @@ function MainApp() {
           </div>
         </div>
       </nav>
+
+      {/* Consultation Modal */}
+      <style>{consultationModalStyle}</style>
+      <div className={`consultation-modal ${isConsultationModalOpen ? 'open' : ''}`} onClick={(e) => {
+        if (e.target === e.currentTarget) handleModalToggle(false);
+      }}>
+        <div className="modal-content">
+          <h2>Book Your Exclusive Consultation</h2>
+          <p>Let's discuss your vision and how we can bring it to life with unparalleled craftsmanship and attention to detail.</p>
+
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            // Handle form submission here
+            handleModalToggle(false);
+          }}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="fullName">Full Name</label>
+              <input
+                id="fullName"
+                type="text"
+                placeholder="Enter your full name"
+                required
+                className="focus:border-red-500 focus:ring-red-500"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="email">Email Address</label>
+              <input
+                id="email"
+                type="email"
+                placeholder="your.email@example.com"
+                required
+                className="focus:border-red-500 focus:ring-red-500"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="phone">Phone Number</label>
+              <input
+                id="phone"
+                type="tel"
+                placeholder="+233 XX XXX XXXX"
+                className="focus:border-red-500 focus:ring-red-500"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="service">Service Type</label>
+              <select
+                id="service"
+                required
+                className="focus:border-red-500 focus:ring-red-500"
+              >
+                <option value="">Select Your Service</option>
+                <option>🏗️ General Construction</option>
+                <option>🏢 Estate Management & Sales</option>
+                <option>🌍 International Project Management</option>
+                <option>🔄 Renovation & Repairs</option>
+                <option>💬 Consultation Only</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="datetime">Preferred Date & Time</label>
+              <input
+                id="datetime"
+                type="datetime-local"
+                placeholder="Select your preferred time"
+                className="focus:border-red-500 focus:ring-red-500"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="project">Project Description</label>
+              <textarea
+                id="project"
+                placeholder="Tell us about your dream project..."
+                rows={4}
+                required
+                className="focus:border-red-500 focus:ring-red-500"
+              ></textarea>
+            </div>
+
+            <div className="buttons">
+              <button type="submit" className="btn-primary">
+                Submit Request
+              </button>
+              <button type="button" className="btn-secondary" onClick={() => handleModalToggle(false)}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
 
       {/* Hero Section */}
       <section 
@@ -979,39 +1478,116 @@ function MainApp() {
               Discover our premium selection of luxury homes and investment properties
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {properties.map((property, index) => (
-              <div 
-                key={index}
-                className="bg-white dark:bg-gray-900 rounded-xl shadow-lg dark:shadow-gray-900/50 overflow-hidden hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-300 transform hover:-translate-y-1"
-              >
-                <div className="relative">
-                  <img 
-                    src={property.image} 
-                    alt={property.title}
-                    className="w-full h-64 object-cover"
-                  />
-                  <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                    {property.price}
+          <div className="flex justify-center">
+            {properties.length > 0 && (() => {
+              const property = properties[0]; // Get the first property
+              // Get exterior images/videos for placeholder
+              const exteriorImageString = property['Exterior Images']?.toString() || '';
+              const exteriorUrls = exteriorImageString
+                .split(',')
+                .map((url: string) => url.replace(/\n/g, '').trim())
+                .filter((url: string) => url && url.length > 0);
+
+              // Separate videos and images
+              const videoUrls = exteriorUrls.filter((url: string) => isVideoUrl(url));
+              const imageUrls = exteriorUrls.filter((url: string) => !isVideoUrl(url));
+
+              // Determine placeholder: use video thumbnail if video exists, otherwise use image
+              let placeholderImage = null;
+
+              if (videoUrls.length > 0) {
+                // Use video thumbnail
+                const randomVideo = videoUrls[Math.floor(Math.random() * videoUrls.length)];
+                placeholderImage = getVideoThumbnail(randomVideo);
+                console.log('Video detected:', randomVideo, 'Thumbnail:', placeholderImage);
+              } else if (imageUrls.length > 0) {
+                // Use regular image
+                const convertedImages = imageUrls.map((url: string) => convertGoogleDriveUrl(url));
+                placeholderImage = convertedImages[Math.floor(Math.random() * convertedImages.length)];
+              }
+
+              return (
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden animate-fade-in-up max-w-md">
+                  {/* Placeholder Image */}
+                  {placeholderImage ? (
+                    <div className="w-full h-64 overflow-hidden bg-gray-200 dark:bg-gray-700">
+                      <img
+                        src={placeholderImage}
+                        alt={property.Title}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
+                        onError={(e) => {
+                          console.error('Failed to load placeholder:', placeholderImage);
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          // Show a fallback background
+                          if (target.parentElement) {
+                            target.parentElement.innerHTML = '<div class="w-full h-full flex items-center justify-center text-gray-500"><svg class="w-16 h-16" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path></svg></div>';
+                          }
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full h-64 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
+                      <svg className="w-16 h-16 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd"></path>
+                      </svg>
+                    </div>
+                  )}
+
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                      {property.Title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 mb-2 flex items-center">
+                      <MapPin className="w-4 h-4 mr-2 text-red-600 dark:text-red-400" />
+                      {property.Location}
+                    </p>
+                    <p className="text-2xl font-semibold text-red-600 dark:text-red-400 mb-4">
+                      {property.Currency} {property.Price}
+                    </p>
+
+                    {/* Bedrooms and Bathrooms */}
+                    <div className="flex items-center gap-6 mb-4">
+                      <div className="flex items-center gap-2">
+                        <Bed className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                        <span className="text-gray-700 dark:text-gray-300">
+                          Bedrooms: <span className="font-bold text-gray-900 dark:text-white">{property.Bedrooms}</span>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Bath className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                        <span className="text-gray-700 dark:text-gray-300">
+                          Bathrooms: <span className="font-bold text-gray-900 dark:text-white">{property.Bathrooms}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-gray-700 dark:text-gray-300 mb-4">
+                      {property.Description}
+                    </p>
+
+                    <button
+                      onClick={() => {
+                        setSelectedProperty(property);
+                        setCurrentImageIndex(0);
+                      }}
+                      className="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg mt-4 transition-colors font-semibold"
+                    >
+                      View All Photos
+                    </button>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h4 className="text-xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">{property.title}</h4>
-                  <p className="text-gray-600 dark:text-gray-400 mb-4 flex items-center transition-colors duration-300">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    {property.location}
-                  </p>
-                  <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-300">
-                    <span>{property.beds} Beds</span>
-                    <span>{property.baths} Baths</span>
-                    <span>{property.area}</span>
-                  </div>
-                  <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-lg transition-colors font-medium">
-                    View Details
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })()}
+          </div>
+          <div className="text-center mt-12">
+            <Link
+              to="/properties"
+              className="inline-flex items-center px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-300 shadow-lg hover:shadow-xl"
+            >
+              View All Properties
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
           </div>
         </div>
       </section>
@@ -1058,7 +1634,10 @@ function MainApp() {
           <p className="text-xl text-white mb-8">
             Book a consultation today and let's discuss how we can help you achieve your property goals
           </p>
-          <button className="bg-white text-red-600 px-8 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition-colors transform hover:scale-105">
+          <button 
+            onClick={() => handleModalToggle(true)}
+            className="bg-white text-red-600 px-8 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition-colors transform hover:scale-105"
+          >
             Book a Consultation Today!
           </button>
         </div>
