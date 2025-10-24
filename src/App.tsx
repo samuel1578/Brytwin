@@ -1695,6 +1695,10 @@ function MainApp() {
               <div className="space-y-4">
                 <div className="flex items-center">
                   <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
+                  <span className="text-gray-400 dark:text-gray-500">(+1 (904) 767-3657)</span>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
                   <span className="text-gray-400 dark:text-gray-500">(+233) 55 805 6649</span>
                 </div>
                 <div className="flex items-center">
