@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Menu,
@@ -17,6 +17,7 @@ import {
   Bed,
   Bath
 } from 'lucide-react';
+import { CurrencyCode, useCurrency } from '../contexts/CurrencyContext';
 import logo from '../logo.jpeg';
 import { ThemeToggle } from '../components/ThemeToggle';
 
@@ -36,6 +37,13 @@ interface Property {
   Status: string;
 }
 
+const CURRENCY_OPTIONS: Array<{ code: CurrencyCode; label: string; symbol: string }> = [
+  { code: 'USD', label: 'US Dollar', symbol: '$' },
+  { code: 'GHS', label: 'Ghana Cedi', symbol: '₵' },
+  { code: 'GBP', label: 'British Pound', symbol: '£' },
+  { code: 'EUR', label: 'Euro', symbol: '€' }
+];
+
 const Properties: React.FC = () => {
   // Scroll to top when component mounts
   useEffect(() => {
@@ -43,6 +51,7 @@ const Properties: React.FC = () => {
   }, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { currency, setCurrency, formatPrice, isLoading, error } = useCurrency();
   const [properties, setProperties] = useState<Property[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -522,6 +531,34 @@ const Properties: React.FC = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white animate-fade-in-up">
             Available Properties
           </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 mb-10">
+            <label
+              htmlFor="currency-select"
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide"
+            >
+              Display Currency
+            </label>
+            <div className="flex flex-col items-start gap-2">
+              <select
+                id="currency-select"
+                value={currency}
+                onChange={event => setCurrency(event.target.value as CurrencyCode)}
+                disabled={isLoading}
+                className="rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {CURRENCY_OPTIONS.map(option => (
+                  <option key={option.code} value={option.code}>
+                    {option.symbol} {option.code} · {option.label}
+                  </option>
+                ))}
+              </select>
+              {error && (
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  {error}
+                </p>
+              )}
+            </div>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {properties.map((property, index) => {
               // Get exterior images/videos for placeholder
@@ -548,6 +585,11 @@ const Properties: React.FC = () => {
                 const convertedImages = imageUrls.map((url: string) => convertGoogleDriveUrl(url));
                 placeholderImage = convertedImages[Math.floor(Math.random() * convertedImages.length)];
               }
+
+              const numericPrice = (() => {
+                const cleaned = parseFloat(property.Price.replace(/[^0-9.]/g, ''));
+                return Number.isFinite(cleaned) ? cleaned : 0;
+              })();
 
               return (
                 <div
@@ -590,7 +632,7 @@ const Properties: React.FC = () => {
                       {property.Location}
                     </p>
                     <p className="text-2xl font-semibold text-red-600 dark:text-red-400 mb-4">
-                      {property.Currency} {property.Price}
+                      {formatPrice(numericPrice)}
                     </p>
 
                     {/* Bedrooms and Bathrooms */}
