@@ -20,6 +20,7 @@ import {
 import { CurrencyCode, useCurrency } from '../contexts/CurrencyContext';
 import logo from '../logo.jpeg';
 import { ThemeToggle } from '../components/ThemeToggle';
+import BookingModal from '../components/BookingModal';
 
 interface Property {
   ID: string;
@@ -51,6 +52,7 @@ const Properties: React.FC = () => {
   }, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const { currency, setCurrency, formatPrice, isLoading, error } = useCurrency();
   const [properties, setProperties] = useState<Property[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
@@ -317,7 +319,10 @@ const Properties: React.FC = () => {
                 </a>
 
                 {/* CTA Button */}
-                <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                <button 
+                  onClick={() => setIsBookingModalOpen(true)}
+                  className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                >
                   Book Now
                 </button>
 
@@ -461,7 +466,10 @@ const Properties: React.FC = () => {
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Ready to Get Started?</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">Book a consultation and let's discuss your project.</p>
                   <button
-                    onClick={toggleMenu}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setIsBookingModalOpen(true);
+                    }}
                     className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-4 rounded-xl text-base font-bold uppercase tracking-wide shadow-lg transition-all duration-200"
                   >
                     Book Now
@@ -860,6 +868,8 @@ const Properties: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
     </div>
   );
 };

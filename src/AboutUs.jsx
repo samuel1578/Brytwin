@@ -20,6 +20,7 @@ import logo from '../logo.jpeg';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { useStaggeredInView } from '../hooks/useInView';
 import { useSwipeable } from 'react-swipeable';
+import BookingModal from '../components/BookingModal';
 
 // Replace with a more professional corporate/architectural image
 
@@ -31,6 +32,7 @@ const patternDark = "https://assets.website-files.com/63904f663019b0d8edf8d57c/6
 
 const AboutUs = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = React.useState(false);
   const navigate = useNavigate();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   
@@ -383,7 +385,7 @@ const AboutUs = () => {
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
                 
-                <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200" onClick={() => setIsBookingModalOpen(true)}>
                   Book Now
                 </button>
 
@@ -518,7 +520,10 @@ const AboutUs = () => {
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Ready to Get Started?</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">Book a consultation and let's discuss your project.</p>
                   <button 
-                    onClick={toggleMenu}
+                    onClick={() => {
+                      toggleMenu();
+                      setIsBookingModalOpen(true);
+                    }}
                     className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-4 rounded-xl text-base font-bold uppercase tracking-wide shadow-lg transition-all duration-200"
                   >
                     Book Now
@@ -940,6 +945,8 @@ const AboutUs = () => {
           </div>
         </div>
       </footer>
+
+      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
     </div>
   );
 };

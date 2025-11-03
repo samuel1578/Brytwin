@@ -26,6 +26,7 @@ import mrBright from '../mr-bright.png';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCards } from 'swiper/modules';
+import BookingModal from '../components/BookingModal';
 import 'swiper/css';
 import 'swiper/css/effect-cards';
 
@@ -39,6 +40,7 @@ const Services: React.FC = () => {
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [swiperInstance, setSwiperInstance] = useState<any>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -286,7 +288,10 @@ const Services: React.FC = () => {
                 </a>
 
                 {/* CTA Button */}
-                <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                <button 
+                  onClick={() => setIsBookingModalOpen(true)}
+                  className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                >
                   Book Now
                 </button>
 
@@ -426,7 +431,10 @@ const Services: React.FC = () => {
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Ready to Get Started?</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">Book a consultation and let's discuss your project.</p>
                   <button
-                    onClick={toggleMenu}
+                    onClick={() => {
+                      toggleMenu();
+                      setIsBookingModalOpen(true);
+                    }}
                     className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-4 rounded-xl text-base font-bold uppercase tracking-wide shadow-lg transition-all duration-200"
                   >
                     Book Now
@@ -1208,6 +1216,9 @@ const Services: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Booking Modal */}
+      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
     </div>
   );
 };

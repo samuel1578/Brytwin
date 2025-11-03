@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
+import BookingModal from './BookingModal';
 import { 
   Menu, 
   X, 
@@ -52,36 +53,8 @@ const AboutUs: React.FC = () => {
   const navigate = useNavigate();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   
-  // Consultation modal state
-  const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
-  const [savedScrollPosition, setSavedScrollPosition] = useState(0);
-
-  // Effect to handle body scroll lock when modal is open
-  useEffect(() => {
-    if (isConsultationModalOpen) {
-      // Save current scroll position
-      const scrollY = window.scrollY;
-      setSavedScrollPosition(scrollY);
-
-      // Prevent scrolling
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-    } else {
-      // Restore scroll position when modal is closed
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-
-      // Restore to the exact saved position
-      window.scrollTo(0, savedScrollPosition);
-    }
-  }, [isConsultationModalOpen, savedScrollPosition]);
-
-  // Modified modal state handler to properly manage scroll lock
-  const handleModalToggle = (open: boolean) => {
-    setIsConsultationModalOpen(open);
-  };
+  // Booking modal state
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   
   // Animation states
   const [, setAnimate] = useState(false);
@@ -192,6 +165,9 @@ const AboutUs: React.FC = () => {
     trackMouse: true
   });
 
+  const handleModalToggle = (isOpen: boolean): void => {
+    setIsBookingModalOpen(isOpen);
+  };
   return (
     <div className="min-h-screen w-screen overflow-x-hidden bg-white dark:bg-gray-900 relative transition-colors duration-300">
       {/* Add custom animations */}
@@ -858,7 +834,10 @@ const AboutUs: React.FC = () => {
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
                 
-                <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                <button 
+                  onClick={() => setIsBookingModalOpen(true)}
+                  className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                >
                   Book Now
                 </button>
 
@@ -997,7 +976,10 @@ const AboutUs: React.FC = () => {
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Ready to Get Started?</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">Book a consultation and let's discuss your project.</p>
                   <button 
-                    onClick={toggleMenu}
+                    onClick={() => {
+                      setIsBookingModalOpen(true);
+                      setIsMenuOpen(false);
+                    }}
                     className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-6 py-4 rounded-xl text-base font-bold uppercase tracking-wide shadow-lg transition-all duration-200"
                   >
                     Book Now
@@ -1058,99 +1040,8 @@ const AboutUs: React.FC = () => {
         </div>
       </nav>
 
-      {/* Consultation Modal */}
-      <div className={`consultation-modal ${isConsultationModalOpen ? 'open' : ''}`} onClick={(e) => {
-        if (e.target === e.currentTarget) handleModalToggle(false);
-      }}>
-        <div className="modal-content">
-          <h2>Book Your Exclusive Consultation</h2>
-          <p>Let's discuss your vision and how we can bring it to life with unparalleled craftsmanship and attention to detail.</p>
-
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            // Handle form submission here
-            handleModalToggle(false);
-          }}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="fullName">Full Name</label>
-              <input
-                id="fullName"
-                type="text"
-                placeholder="Enter your full name"
-                required
-                className="focus:border-red-500 focus:ring-red-500"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="email">Email Address</label>
-              <input
-                id="email"
-                type="email"
-                placeholder="your.email@example.com"
-                required
-                className="focus:border-red-500 focus:ring-red-500"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="phone">Phone Number</label>
-              <input
-                id="phone"
-                type="tel"
-                placeholder="+233 XX XXX XXXX"
-                className="focus:border-red-500 focus:ring-red-500"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="service">Service Type</label>
-              <select
-                id="service"
-                required
-                className="focus:border-red-500 focus:ring-red-500"
-              >
-                <option value="">Select Your Service</option>
-                <option>🏗️ General Construction</option>
-                <option>🏢 Estate Management & Sales</option>
-                <option>🌍 International Project Management</option>
-                <option>🔄 Renovation & Repairs</option>
-                <option>💬 Consultation Only</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="datetime">Preferred Date & Time</label>
-              <input
-                id="datetime"
-                type="datetime-local"
-                placeholder="Select your preferred time"
-                className="focus:border-red-500 focus:ring-red-500"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="project">Project Description</label>
-              <textarea
-                id="project"
-                placeholder="Tell us about your dream project..."
-                rows={4}
-                required
-                className="focus:border-red-500 focus:ring-red-500"
-              ></textarea>
-            </div>
-
-            <div className="buttons">
-              <button type="submit" className="btn-primary">
-                Submit Request
-              </button>
-              <button type="button" className="btn-secondary" onClick={() => handleModalToggle(false)}>
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+      {/* Booking Modal */}
+      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
 
       {/* New Architectural Hero Section */}
       <div 
@@ -1306,6 +1197,7 @@ The family has an unwavering determination to help many people build the home or
             <div className="flex flex-col sm:flex-row justify-center gap-4 md:gap-6 opacity-0 animate-slide-up-fade-in delay-500">
               
               <button 
+                onClick={() => navigate('/services')}
                 className="relative overflow-hidden group px-8 py-4 border-2 border-emerald-500 text-emerald-500 dark:text-emerald-400 dark:border-emerald-400 hover:text-white dark:hover:text-white rounded-lg font-bold transition-all duration-300"
               >
                 <span className="relative z-10">Our Services</span>

@@ -32,6 +32,7 @@ import constructionImg from './construction.jpg';
 import goodsImg from './goods.jpg';
 import { ThemeToggle } from './components/ThemeToggle';
 import { useInView, useStaggeredInView } from './hooks/useInView';
+import BookingModal from './components/BookingModal';
 
 interface Property {
   ID: string;
@@ -1196,99 +1197,7 @@ function MainApp() {
       </nav>
 
       {/* Consultation Modal */}
-      <style>{consultationModalStyle}</style>
-      <div className={`consultation-modal ${isConsultationModalOpen ? 'open' : ''}`} onClick={(e) => {
-        if (e.target === e.currentTarget) handleModalToggle(false);
-      }}>
-        <div className="modal-content">
-          <h2>Book Your Exclusive Consultation</h2>
-          <p>Let's discuss your vision and how we can bring it to life with unparalleled craftsmanship and attention to detail.</p>
-
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            // Handle form submission here
-            handleModalToggle(false);
-          }}>
-            <div className="form-group">
-              <label className="form-label" htmlFor="fullName">Full Name</label>
-              <input
-                id="fullName"
-                type="text"
-                placeholder="Enter your full name"
-                required
-                className="focus:border-red-500 focus:ring-red-500"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="email">Email Address</label>
-              <input
-                id="email"
-                type="email"
-                placeholder="your.email@example.com"
-                required
-                className="focus:border-red-500 focus:ring-red-500"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="phone">Phone Number</label>
-              <input
-                id="phone"
-                type="tel"
-                placeholder="+233 XX XXX XXXX"
-                className="focus:border-red-500 focus:ring-red-500"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="service">Service Type</label>
-              <select
-                id="service"
-                required
-                className="focus:border-red-500 focus:ring-red-500"
-              >
-                <option value="">Select Your Service</option>
-                <option>🏗️ General Construction</option>
-                <option>🏢 Estate Management & Sales</option>
-                <option>🌍 International Project Management</option>
-                <option>🔄 Renovation & Repairs</option>
-                <option>💬 Consultation Only</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="datetime">Preferred Date & Time</label>
-              <input
-                id="datetime"
-                type="datetime-local"
-                placeholder="Select your preferred time"
-                className="focus:border-red-500 focus:ring-red-500"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="form-label" htmlFor="project">Project Description</label>
-              <textarea
-                id="project"
-                placeholder="Tell us about your dream project..."
-                rows={4}
-                required
-                className="focus:border-red-500 focus:ring-red-500"
-              ></textarea>
-            </div>
-
-            <div className="buttons">
-              <button type="submit" className="btn-primary">
-                Submit Request
-              </button>
-              <button type="button" className="btn-secondary" onClick={() => handleModalToggle(false)}>
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+      <BookingModal isOpen={isConsultationModalOpen} onClose={() => handleModalToggle(false)} />
 
       {/* Hero Section */}
       <section 
