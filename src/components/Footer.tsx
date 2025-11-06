@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useStaggeredInView } from '../hooks/useInView';
 import { 
   Phone, 
@@ -11,6 +12,7 @@ import {
 import logo from '../logo.jpeg';
 
 const Footer = () => {
+  const navigate = useNavigate();
   const contactSectionRef = useStaggeredInView<HTMLDivElement>(4, 100);
 
   return (
@@ -55,7 +57,30 @@ const Footer = () => {
               <li><a href="#about" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">About Us</a></li>
               <li><a href="#services" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Services</a></li>
               <li><a href="#properties" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
-              <li><a href="#gallery" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Gallery</a></li>
+              <li>
+                <a
+                  href="/gallery"
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate('/gallery');
+                  }}
+                  className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors"
+                >
+                  Gallery
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/contact"
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate('/contact');
+                  }}
+                  className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors"
+                >
+                  Contact
+                </a>
+              </li>
             </ul>
           </div>
 

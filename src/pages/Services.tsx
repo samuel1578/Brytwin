@@ -278,11 +278,25 @@ const Services: React.FC = () => {
                   Properties
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/#gallery" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a
+                  href="/gallery"
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate('/gallery');
+                  }}
+                  className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                >
                   Gallery
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/#contact" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a
+                  href="/contact"
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate('/contact');
+                  }}
+                  className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group"
+                >
                   Contact
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
@@ -403,16 +417,24 @@ const Services: React.FC = () => {
                     Properties
                   </a>
                   <a
-                    href="#gallery"
-                    onClick={toggleMenu}
+                    href="/gallery"
+                    onClick={e => {
+                      e.preventDefault();
+                      toggleMenu();
+                      navigate('/gallery');
+                    }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Globe className="w-5 h-5 mr-4" />
                     Gallery
                   </a>
                   <a
-                    href="#contact"
-                    onClick={toggleMenu}
+                    href="/contact"
+                    onClick={e => {
+                      e.preventDefault();
+                      toggleMenu();
+                      navigate('/contact');
+                    }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Phone className="w-5 h-5 mr-4" />
@@ -1165,7 +1187,30 @@ const Services: React.FC = () => {
                 <li><a href="/about" onClick={e => {e.preventDefault(); navigate('/about');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">About Us</a></li>
                 <li><a href="/services" onClick={e => {e.preventDefault(); navigate('/services');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Services</a></li>
                 <li><a href="/properties" onClick={e => {e.preventDefault(); navigate('/properties');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
-                <li><a href="/#gallery" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Gallery</a></li>
+                <li>
+                  <a
+                    href="/gallery"
+                    onClick={e => {
+                      e.preventDefault();
+                      navigate('/gallery');
+                    }}
+                    className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors"
+                  >
+                    Gallery
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/contact"
+                    onClick={e => {
+                      e.preventDefault();
+                      navigate('/contact');
+                    }}
+                    className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors"
+                  >
+                    Contact Us
+                  </a>
+                </li>
               </ul>
             </div>
 

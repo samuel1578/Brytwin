@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { 
   Menu, 
   X, 
@@ -22,6 +22,29 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActivePath = (path: string) => location.pathname === path;
+
+  const desktopLinkClasses = (path: string) => {
+    const isActive = isActivePath(path);
+    const base = 'relative text-sm uppercase tracking-wide font-semibold transition-colors group';
+    return isActive
+      ? `${base} text-red-600 dark:text-red-400`
+      : `${base} text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400`;
+  };
+
+  const underlineClasses = (path: string) => {
+    const isActive = isActivePath(path);
+    return `absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform transition-transform ${
+      isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+    }`;
+  };
+
+  const mobileLinkClasses = (path: string) =>
+    isActivePath(path)
+      ? 'flex items-center px-4 py-4 text-lg font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-xl transition-all hover:bg-red-100 dark:hover:bg-red-900/30'
+      : 'flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400';
 
   // Navigation scroll state
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -74,29 +97,64 @@ const Header = () => {
             {/* Desktop Navigation */}
             <div className="hidden lg:block">
               <div className="flex items-center space-x-8">
-                <a href="#home" className="relative text-red-600 dark:text-red-400 font-semibold text-sm uppercase tracking-wide hover:text-red-700 dark:hover:text-red-300 transition-colors group">
+                <a
+                  href="/"
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate('/');
+                  }}
+                  className={desktopLinkClasses('/')}
+                >
                   Home
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-100 transition-transform"></span>
+                  <span className={underlineClasses('/')}></span>
                 </a>
-                <a href="/about" onClick={e => {e.preventDefault(); navigate && navigate('/about');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a
+                  href="/about"
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate('/about');
+                  }}
+                  className={desktopLinkClasses('/about')}
+                >
                   About Us
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                  <span className={underlineClasses('/about')}></span>
                 </a>
-                <a href="/services" onClick={e => {e.preventDefault(); navigate && navigate('/services');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a
+                  href="/services"
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate('/services');
+                  }}
+                  className={desktopLinkClasses('/services')}
+                >
                   Services
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                  <span className={underlineClasses('/services')}></span>
                 </a>
-                <a href="#properties" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="#properties" className="relative text-sm uppercase tracking-wide font-semibold text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Properties
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="#gallery" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a
+                  href="/gallery"
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate('/gallery');
+                  }}
+                  className={desktopLinkClasses('/gallery')}
+                >
                   Gallery
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                  <span className={underlineClasses('/gallery')}></span>
                 </a>
-                <a href="#contact" className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a
+                  href="/contact"
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate('/contact');
+                  }}
+                  className={desktopLinkClasses('/contact')}
+                >
                   Contact
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                  <span className={underlineClasses('/contact')}></span>
                 </a>
                 
                 {/* CTA Button */}
@@ -172,25 +230,29 @@ const Header = () => {
               <div className="flex-1 px-6 py-8">
                 <nav className="space-y-2">
                   <a 
-                    href="#home" 
-                    onClick={toggleMenu}
-                    className="flex items-center px-4 py-4 text-lg font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-xl transition-all hover:bg-red-100 dark:hover:bg-red-900/30"
+                    href="/" 
+                    onClick={e => {
+                      e.preventDefault();
+                      toggleMenu();
+                      navigate('/');
+                    }}
+                    className={mobileLinkClasses('/')}
                   >
                     <Home className="w-5 h-5 mr-4" />
                     Home
                   </a>
                   <a 
                     href="/about" 
-                    onClick={e => {e.preventDefault(); toggleMenu(); navigate && navigate('/about');}}
-                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
+                    onClick={e => {e.preventDefault(); toggleMenu(); navigate('/about');}}
+                    className={mobileLinkClasses('/about')}
                   >
                     <Users className="w-5 h-5 mr-4" />
                     About Us
                   </a>
                   <a 
                     href="/services" 
-                    onClick={e => {e.preventDefault(); toggleMenu(); navigate && navigate('/services');}}
-                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
+                    onClick={e => {e.preventDefault(); toggleMenu(); navigate('/services');}}
+                    className={mobileLinkClasses('/services')}
                   >
                     <Building className="w-5 h-5 mr-4" />
                     Services
@@ -204,17 +266,25 @@ const Header = () => {
                     Properties
                   </a>
                   <a 
-                    href="#gallery" 
-                    onClick={toggleMenu}
-                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
+                    href="/gallery" 
+                    onClick={e => {
+                      e.preventDefault();
+                      toggleMenu();
+                      navigate('/gallery');
+                    }}
+                    className={mobileLinkClasses('/gallery')}
                   >
                     <Globe className="w-5 h-5 mr-4" />
                     Gallery
                   </a>
                   <a 
-                    href="#contact" 
-                    onClick={toggleMenu}
-                    className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
+                    href="/contact" 
+                    onClick={e => {
+                      e.preventDefault();
+                      toggleMenu();
+                      navigate('/contact');
+                    }}
+                    className={mobileLinkClasses('/contact')}
                   >
                     <Phone className="w-5 h-5 mr-4" />
                     Contact
