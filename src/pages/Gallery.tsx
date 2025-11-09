@@ -91,9 +91,9 @@ const GALLERY_ITEMS: GalleryItem[] = [
 ];
 
 const HIGHLIGHT_METRICS = [
-	{ value: '120+', label: 'Handed-over Residences' },
-	{ value: '18', label: 'Active Construction Sites' },
-	{ value: '15+', label: 'Years Crafting Spaces' }
+	{ value: '9+', label: 'Handed-over Residences' },
+	{ value: '11', label: 'Active Construction Sites' },
+	{ value: '7+', label: 'Years Crafting Spaces' }
 ];
 
 const Gallery: React.FC = () => {
