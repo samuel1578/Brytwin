@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
-import { 
-  Menu, 
-  X, 
-  Phone, 
-  Mail, 
-  MapPin, 
+import {
+  Menu,
+  X,
+  Phone,
+  Mail,
+  MapPin,
   Users,
   Home,
   Building,
@@ -33,24 +33,25 @@ const patternDark = "https://assets.website-files.com/63904f663019b0d8edf8d57c/6
 const AboutUs = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = React.useState(false);
+  const [localToast, setLocalToast] = React.useState(null);
   const navigate = useNavigate();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  
+
   // Animation states
   const [, setAnimate] = useState(false);
-  
+
   // Start animations after component mount
   useEffect(() => {
     setAnimate(true);
   }, []);
 
   // Animation hooks (copied from main app for consistency)
-  const contactSectionRef = useStaggeredInView<HTMLDivElement>(4, 100);
-  
+  const contactSectionRef = useStaggeredInView < HTMLDivElement > (4, 100);
+
   // Mouse movement tracking for interactive elements
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const heroRef = useRef<HTMLDivElement>(null);
-  
+  const heroRef = useRef < HTMLDivElement > (null);
+
   // Track mouse position for parallax effect
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -61,7 +62,7 @@ const AboutUs = () => {
         setMousePosition({ x, y });
       }
     };
-    
+
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
@@ -75,7 +76,7 @@ const AboutUs = () => {
   };
 
   const [currentParagraph, setCurrentParagraph] = useState(0);
-  
+
   const storyParagraphs = [
     {
       text: "Every great venture begins with a shared vision. Ours started with two individuals who believed in combining practical expertise with strategic foresight to build something remarkable.",
@@ -334,9 +335,9 @@ const AboutUs = () => {
           <div className="flex justify-between items-center h-20">
             {/* Logo and Company Name */}
             <div className="flex items-center space-x-4">
-              <img 
-                src={logo} 
-                alt="Brytwin Homes Logo" 
+              <img
+                src={logo}
+                alt="Brytwin Homes Logo"
                 className="h-12 w-12 object-contain"
               />
               <div className="flex flex-col">
@@ -352,13 +353,13 @@ const AboutUs = () => {
             {/* Desktop Navigation */}
             <div className="hidden lg:block">
               <div className="flex items-center space-x-8">
-                <a 
-                  href="/" 
+                <a
+                  href="/"
                   onClick={(e) => {
                     e.preventDefault();
                     navigate('/');
                     window.scrollTo(0, 0);
-                  }} 
+                  }}
                   className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group"
                 >
                   Home
@@ -368,23 +369,23 @@ const AboutUs = () => {
                   About Us
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/#services" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/#services" onClick={e => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Services
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/#properties" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('properties')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/#properties" onClick={e => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('properties')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Properties
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/#gallery" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/#gallery" onClick={e => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Gallery
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/#contact" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/#contact" onClick={e => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Contact
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                
+
                 <button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200" onClick={() => setIsBookingModalOpen(true)}>
                   Book Now
                 </button>
@@ -406,32 +407,29 @@ const AboutUs = () => {
         </div>
 
         {/* Mobile Navigation (full implementation copied from App.tsx) */}
-        <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${
-          isMenuOpen 
-            ? 'opacity-100 visible' 
+        <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${isMenuOpen
+            ? 'opacity-100 visible'
             : 'opacity-0 invisible pointer-events-none'
-        }`}>
+          }`}>
           {/* Backdrop */}
-          <div 
-            className={`fixed inset-0 bg-black/50 transition-opacity duration-500 ${
-              isMenuOpen ? 'opacity-100' : 'opacity-0'
-            }`}
+          <div
+            className={`fixed inset-0 bg-black/50 transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'
+              }`}
             onClick={toggleMenu}
           />
-          
+
           {/* Modal Content */}
-          <div className={`fixed inset-0 w-full h-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md transform transition-transform duration-500 ease-in-out ${
-            isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}>
+          <div className={`fixed inset-0 w-full h-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md transform transition-transform duration-500 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}>
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
               <div className="flex items-center space-x-3">
-                <img 
-                  src={logo} 
-                  alt="Brytwin Homes Logo" 
+                <img
+                  src={logo}
+                  alt="Brytwin Homes Logo"
                   className="h-10 w-10 object-contain"
                 />
-                
+
                 <div className="flex flex-col">
                   <h1 className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                     Brytwin Homes
@@ -441,7 +439,7 @@ const AboutUs = () => {
                   </p>
                 </div>
               </div>
-              
+
               <button
                 onClick={toggleMenu}
                 className="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -454,8 +452,8 @@ const AboutUs = () => {
             <div className="flex flex-col h-full overflow-y-auto" style={{ height: 'calc(100vh - 92px)' }}>
               <div className="flex-1 px-6 py-8">
                 <nav className="space-y-2">
-                  <a 
-                    href="/" 
+                  <a
+                    href="/"
                     onClick={(e) => {
                       e.preventDefault();
                       toggleMenu();
@@ -467,40 +465,40 @@ const AboutUs = () => {
                     <Home className="w-5 h-5 mr-4" />
                     Home
                   </a>
-                  <a 
-                    href="/about" 
-                    onClick={e => {e.preventDefault(); toggleMenu(); navigate('/about');}}
+                  <a
+                    href="/about"
+                    onClick={e => { e.preventDefault(); toggleMenu(); navigate('/about'); }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-xl transition-all hover:bg-red-100 dark:hover:bg-red-900/30"
                   >
                     <Users className="w-5 h-5 mr-4" />
                     About Us
                   </a>
-                  <a 
-                    href="#services" 
+                  <a
+                    href="#services"
                     onClick={toggleMenu}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Building className="w-5 h-5 mr-4" />
                     Services
                   </a>
-                  <a 
-                    href="#properties" 
+                  <a
+                    href="#properties"
                     onClick={toggleMenu}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Home className="w-5 h-5 mr-4" />
                     Properties
                   </a>
-                  <a 
-                    href="#gallery" 
+                  <a
+                    href="#gallery"
                     onClick={toggleMenu}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Globe className="w-5 h-5 mr-4" />
                     Gallery
                   </a>
-                  <a 
-                    href="#contact" 
+                  <a
+                    href="#contact"
                     onClick={toggleMenu}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
@@ -519,7 +517,7 @@ const AboutUs = () => {
                 <div className="mt-8 p-6 bg-gradient-to-r from-red-50 to-emerald-50 dark:from-red-900/20 dark:to-emerald-900/20 rounded-2xl">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Ready to Get Started?</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">Book a consultation and let's discuss your project.</p>
-                  <button 
+                  <button
                     onClick={() => {
                       toggleMenu();
                       setIsBookingModalOpen(true);
@@ -568,27 +566,27 @@ const AboutUs = () => {
       </nav>
 
       {/* New Architectural Hero Section */}
-      <div 
+      <div
         ref={heroRef}
         className="relative min-h-screen pt-20 overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-500"
       >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10 dark:opacity-20">
-          <img 
-            src={patternLight} 
-            alt="Pattern" 
+          <img
+            src={patternLight}
+            alt="Pattern"
             className="w-full h-full object-cover block dark:hidden"
           />
-          <img 
-            src={patternDark} 
-            alt="Pattern" 
+          <img
+            src={patternDark}
+            alt="Pattern"
             className="w-full h-full object-cover hidden dark:block"
           />
         </div>
-        
+
         {/* Geometric Grid */}
         <div className="absolute inset-0 geo-grid"></div>
-        
+
         {/* Animated Shapes */}
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-500/30 dark:bg-red-600/20 rounded-full blur-3xl animate-pulse-glow"
           style={{
@@ -603,7 +601,7 @@ const AboutUs = () => {
             animationDelay: '1s'
           }}
         ></div>
-        
+
         {/* SVG Architectural Lines */}
         <svg className="absolute inset-0 w-full h-full z-10 opacity-20 dark:opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
           <line x1="0" y1="0" x2="100" y2="100" stroke="currentColor" strokeWidth="0.2" className="animate-draw-line text-gray-600 dark:text-gray-400" />
@@ -612,7 +610,7 @@ const AboutUs = () => {
           <line x1="0" y1="50" x2="100" y2="50" stroke="currentColor" strokeWidth="0.2" className="animate-draw-line delay-600 text-gray-600 dark:text-gray-400" />
           <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="0.2" className="animate-draw-line delay-800 text-red-500 dark:text-red-400" />
         </svg>
-        
+
         {/* Rotating Architectural Element */}
         <div className="absolute right-[5%] top-1/4 w-40 h-40 md:w-64 md:h-64 opacity-10 dark:opacity-20 animate-rotate-slow">
           <svg viewBox="0 0 100 100" className="w-full h-full">
@@ -623,7 +621,7 @@ const AboutUs = () => {
             <path d="M50 25 L75 50 L50 75 L25 50 Z" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-gray-600 dark:text-gray-400" />
           </svg>
         </div>
-        
+
         {/* Content Container */}
         <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center items-center pt-16 md:pt-0">
           <div className="text-center max-w-4xl">
@@ -633,25 +631,25 @@ const AboutUs = () => {
             >
               About Our Company
             </h1>
-            
+
             {/* Main Heading - UPDATED */}
-            <h1 
+            <h1
               className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 opacity-0 animate-slide-up-fade-in delay-200 tracking-tight"
             >
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-red-500">Strategic Builders.</span> <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-emerald-500 dark:from-emerald-400 dark:to-emerald-300">Global Negotiators. Trusted Managers.</span>
             </h1>
-            
+
             {/* Subheading - UPDATED */}
-            <p 
+            <p
               className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-10 opacity-0 animate-slide-up-fade-in delay-300 max-w-3xl mx-auto"
             >
               We integrate real estate management, construction craftsmanship, and international business strategy to create lasting value across industries and continents.
             </p>
-            
+
             {/* Founders Section - Glassmorphic Cards */}
             <div className="flex flex-col md:flex-row justify-center gap-6 md:gap-10 mb-10 opacity-0 animate-slide-up-fade-in delay-400">
               {/* Mr. Bright */}
-              <div 
+              <div
                 className="glassmorphism rounded-2xl p-5 flex flex-col items-center transition-all duration-300 shadow-lg hover:shadow-xl"
                 style={{
                   transform: `perspective(1000px) rotateY(${(mousePosition.x - 0.5) * 10}deg) rotateX(${(mousePosition.y - 0.5) * -10}deg)`,
@@ -660,9 +658,9 @@ const AboutUs = () => {
               >
                 <div className="relative w-24 h-24 mb-3">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-red-600 to-red-500 blur-lg opacity-70"></div>
-                  <img 
-                    src={founderBright} 
-                    alt="Mr. Bright" 
+                  <img
+                    src={founderBright}
+                    alt="Mr. Bright"
                     className="w-full h-full object-cover rounded-full relative z-10 border-2 border-white dark:border-gray-800"
                   />
                 </div>
@@ -672,9 +670,9 @@ const AboutUs = () => {
                   "Building tomorrow's landmarks with today's vision."
                 </p>
               </div>
-              
+
               {/* Mrs. Winifred */}
-              <div 
+              <div
                 className="glassmorphism rounded-2xl p-5 flex flex-col items-center transition-all duration-300 shadow-lg hover:shadow-xl"
                 style={{
                   transform: `perspective(1000px) rotateY(${(mousePosition.x - 0.5) * 10}deg) rotateX(${(mousePosition.y - 0.5) * -10}deg)`,
@@ -683,9 +681,9 @@ const AboutUs = () => {
               >
                 <div className="relative w-24 h-24 mb-3">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-500 blur-lg opacity-70"></div>
-                  <img 
-                    src={founderWinifred} 
-                    alt="Mrs. Winifred" 
+                  <img
+                    src={founderWinifred}
+                    alt="Mrs. Winifred"
                     className="w-full h-full object-cover rounded-full relative z-10 border-2 border-white dark:border-gray-800"
                   />
                 </div>
@@ -696,17 +694,17 @@ const AboutUs = () => {
                 </p>
               </div>
             </div>
-            
+
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row justify-center gap-4 md:gap-6 opacity-0 animate-slide-up-fade-in delay-500">
-              <button 
+              <button
                 className="relative overflow-hidden group px-8 py-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white rounded-lg font-bold shadow-lg transition-all duration-300"
               >
                 <span className="relative z-10">Our Story</span>
                 <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-red-700 to-red-800 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
               </button>
-              
-              <button 
+
+              <button
                 className="relative overflow-hidden group px-8 py-4 border-2 border-emerald-500 text-emerald-500 dark:text-emerald-400 dark:border-emerald-400 hover:text-white dark:hover:text-white rounded-lg font-bold transition-all duration-300"
               >
                 <span className="relative z-10">Our Projects</span>
@@ -714,9 +712,9 @@ const AboutUs = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Scroll Indicator */}
-          <div 
+          <div
             className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer opacity-0 animate-slide-up-fade-in delay-700"
             onClick={scrollToNextSection}
           >
@@ -737,20 +735,19 @@ const AboutUs = () => {
               Our Story
             </h1>
           </div>
-          
+
           {/* Desktop and Mobile Layout Container */}
           <div className="flex flex-col lg:flex-row max-w-6xl mx-auto gap-8 lg:gap-16">
             {/* Content Area */}
             <div className="lg:w-2/3" {...handlers}>
               {/* Story Content */}
               <div className="relative min-h-[300px] mb-4 lg:mb-0">
-                <div 
+                <div
                   key={currentParagraph}
-                  className={`story-paragraph ${
-                    storyParagraphs[currentParagraph].isIntro 
-                      ? 'text-xl md:text-2xl font-medium' 
+                  className={`story-paragraph ${storyParagraphs[currentParagraph].isIntro
+                      ? 'text-xl md:text-2xl font-medium'
                       : 'text-lg md:text-xl'
-                  } leading-relaxed tracking-wide text-gray-700 dark:text-gray-300`}
+                    } leading-relaxed tracking-wide text-gray-700 dark:text-gray-300`}
                 >
                   {storyParagraphs[currentParagraph].text}
                 </div>
@@ -762,11 +759,10 @@ const AboutUs = () => {
                   <button
                     key={index}
                     onClick={() => setCurrentParagraph(index)}
-                    className={`h-1 rounded-full transition-all duration-300 ${
-                      index === currentParagraph
+                    className={`h-1 rounded-full transition-all duration-300 ${index === currentParagraph
                         ? 'story-indicator active bg-red-600 dark:bg-red-500'
                         : 'story-indicator w-4 bg-gray-300 dark:bg-gray-700'
-                    }`}
+                      }`}
                     aria-label={`Go to paragraph ${index + 1}`}
                   />
                 ))}
@@ -779,17 +775,16 @@ const AboutUs = () => {
                 <button
                   key={index}
                   onClick={() => setCurrentParagraph(index)}
-                  className={`w-full text-left p-4 rounded-lg transition-all duration-300 ${
-                    index === currentParagraph
+                  className={`w-full text-left p-4 rounded-lg transition-all duration-300 ${index === currentParagraph
                       ? 'bg-red-600 text-white shadow-lg'
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
+                    }`}
                 >
                   <span className="block font-medium">
-                    {index === 0 ? 'Vision' : 
-                     index === 1 ? 'Leadership' :
-                     index === 2 ? 'Partnership' :
-                     'Growth'}
+                    {index === 0 ? 'Vision' :
+                      index === 1 ? 'Leadership' :
+                        index === 2 ? 'Partnership' :
+                          'Growth'}
                   </span>
                 </button>
               ))}
@@ -859,16 +854,16 @@ const AboutUs = () => {
       {/* Footer section */}
       <footer id="contact" className="bg-gray-900 dark:bg-gray-950 text-white py-16 scroll-mt-20 transition-colors duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div 
+          <div
             ref={contactSectionRef.ref}
             className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8"
           >
             {/* Company Info */}
             <div className={`col-span-1 md:col-span-2 stagger-item ${contactSectionRef.visibleItems[0] ? 'visible' : ''}`}>
               <div className="flex items-center mb-6">
-                <img 
-                  src={logo} 
-                  alt="Brytwin Homes Logo" 
+                <img
+                  src={logo}
+                  alt="Brytwin Homes Logo"
                   className="w-12 h-12 rounded-lg mr-3 object-cover"
                 />
                 <div>
@@ -879,7 +874,7 @@ const AboutUs = () => {
                 </div>
               </div>
               <p className="text-gray-400 dark:text-gray-500 mb-6 max-w-md transition-colors duration-300">
-                Your trusted partner in luxury real estate, construction, and property management services. 
+                Your trusted partner in luxury real estate, construction, and property management services.
                 Excellence in every project, professionalism in every interaction.
               </p>
               <div className="flex space-x-4">
@@ -924,8 +919,8 @@ const AboutUs = () => {
               <div className="mt-8">
                 <h5 className="font-bold mb-3">Newsletter</h5>
                 <div className="flex">
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     placeholder="Your email"
                     className="flex-1 px-3 py-2 bg-gray-800 dark:bg-gray-950 text-white rounded-l-lg border border-gray-700 dark:border-gray-600 focus:outline-none focus:border-red-600 dark:focus:border-red-400 transition-colors duration-300"
                   />
@@ -946,7 +941,13 @@ const AboutUs = () => {
         </div>
       </footer>
 
-      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
+      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} onSuccess={(msg) => { setLocalToast(msg || "Thanks — we'll respond within one working day."); setTimeout(() => setLocalToast(null), 3500); }} />
+
+      {localToast && (
+        <div className="fixed right-4 top-24 z-[9999] w-auto max-w-xs rounded-xl px-4 py-3 text-sm font-medium shadow-xl transition">
+          <div className={`rounded-lg px-4 py-2 bg-emerald-600 text-white`}>{localToast}</div>
+        </div>
+      )}
     </div>
   );
 };

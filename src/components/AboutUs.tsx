@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from 'react-router-dom';
 import BookingModal from './BookingModal';
-import { 
-  Menu, 
-  X, 
-  Phone, 
-  Mail, 
-  MapPin, 
+import {
+  Menu,
+  X,
+  Phone,
+  Mail,
+  MapPin,
   Users,
   Home,
   Building,
@@ -52,13 +52,14 @@ const AboutUs: React.FC = () => {
   const [swiper, setSwiper] = useState<any>(null);
   const navigate = useNavigate();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  
+
   // Booking modal state
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  
+  const [localToast, setLocalToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
   // Animation states
   const [, setAnimate] = useState(false);
-  
+
   // Start animations after component mount
   useEffect(() => {
     setAnimate(true);
@@ -71,11 +72,11 @@ const AboutUs: React.FC = () => {
 
   // Animation hooks (copied from main app for consistency)
   const contactSectionRef = useStaggeredInView<HTMLDivElement>(4, 100);
-  
+
   // Mouse movement tracking for interactive elements
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
-  
+
   // Track mouse position for parallax effect
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -86,7 +87,7 @@ const AboutUs: React.FC = () => {
         setMousePosition({ x, y });
       }
     };
-    
+
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
@@ -138,7 +139,7 @@ const AboutUs: React.FC = () => {
       }
     };
   }, []);
-  
+
   const storyParagraphs = [
     {
       text: "Every great venture begins with a shared vision. Ours started with two individuals who believed in combining practical expertise with strategic foresight to build something remarkable.",
@@ -779,9 +780,9 @@ const AboutUs: React.FC = () => {
           <div className="flex justify-between items-center h-20">
             {/* Logo and Company Name */}
             <div className="flex items-center space-x-4">
-              <img 
-                src={logo} 
-                alt="Brytwin Homes Logo" 
+              <img
+                src={logo}
+                alt="Brytwin Homes Logo"
                 className="h-12 w-12 object-contain"
               />
               <div className="flex flex-col">
@@ -797,13 +798,13 @@ const AboutUs: React.FC = () => {
             {/* Desktop Navigation */}
             <div className="hidden lg:block">
               <div className="flex items-center space-x-8">
-                <a 
-                  href="/" 
+                <a
+                  href="/"
                   onClick={(e) => {
                     e.preventDefault();
                     navigate('/');
                     window.scrollTo(0, 0);
-                  }} 
+                  }}
                   className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group"
                 >
                   Home
@@ -813,28 +814,28 @@ const AboutUs: React.FC = () => {
                   About Us
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-100 transition-transform"></span>
                 </a>
-                <a 
-                  href="/services" 
-                  onClick={e => {e.preventDefault(); navigate('/services');}} 
+                <a
+                  href="/services"
+                  onClick={e => { e.preventDefault(); navigate('/services'); }}
                   className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group"
                 >
                   Services
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/#properties" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('properties')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/#properties" onClick={e => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('properties')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Properties
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/#gallery" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/#gallery" onClick={e => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Gallery
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/#contact" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/#contact" onClick={e => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Contact
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                
-                <button 
+
+                <button
                   onClick={() => setIsBookingModalOpen(true)}
                   className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                 >
@@ -858,32 +859,29 @@ const AboutUs: React.FC = () => {
         </div>
 
         {/* Mobile Navigation (full implementation copied from App.tsx) */}
-        <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${
-          isMenuOpen 
-            ? 'opacity-100 visible' 
+        <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${isMenuOpen
+            ? 'opacity-100 visible'
             : 'opacity-0 invisible pointer-events-none'
-        }`}>
+          }`}>
           {/* Backdrop */}
-          <div 
-            className={`fixed inset-0 bg-black/50 transition-opacity duration-500 ${
-              isMenuOpen ? 'opacity-100' : 'opacity-0'
-            }`}
+          <div
+            className={`fixed inset-0 bg-black/50 transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0'
+              }`}
             onClick={toggleMenu}
           />
-          
+
           {/* Modal Content - Updated with solid background */}
-          <div className={`fixed inset-0 w-full h-full bg-white dark:bg-gray-900 transform transition-transform duration-500 ease-in-out ${
-            isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}>
+          <div className={`fixed inset-0 w-full h-full bg-white dark:bg-gray-900 transform transition-transform duration-500 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}>
             {/* Header - Updated with solid background */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
               <div className="flex items-center space-x-3">
-                <img 
-                  src={logo} 
-                  alt="Brytwin Homes Logo" 
+                <img
+                  src={logo}
+                  alt="Brytwin Homes Logo"
                   className="h-10 w-10 object-contain"
                 />
-                
+
                 <div className="flex flex-col">
                   <h1 className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                     Brytwin Homes
@@ -893,7 +891,7 @@ const AboutUs: React.FC = () => {
                   </p>
                 </div>
               </div>
-              
+
               <button
                 onClick={toggleMenu}
                 className="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -906,8 +904,8 @@ const AboutUs: React.FC = () => {
             <div className="flex flex-col h-full overflow-y-auto bg-white dark:bg-gray-900" style={{ height: 'calc(100vh - 92px)' }}>
               <div className="flex-1 px-6 py-8">
                 <nav className="space-y-2">
-                  <a 
-                    href="/" 
+                  <a
+                    href="/"
                     onClick={(e) => {
                       e.preventDefault();
                       toggleMenu();
@@ -919,16 +917,16 @@ const AboutUs: React.FC = () => {
                     <Home className="w-5 h-5 mr-4" />
                     Home
                   </a>
-                  <a 
-                    href="/about" 
-                    onClick={e => {e.preventDefault(); toggleMenu(); navigate('/about');}}
+                  <a
+                    href="/about"
+                    onClick={e => { e.preventDefault(); toggleMenu(); navigate('/about'); }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-xl transition-all hover:bg-red-100 dark:hover:bg-red-900/30"
                   >
                     <Users className="w-5 h-5 mr-4" />
                     About Us
                   </a>
-                  <a 
-                    href="/services" 
+                  <a
+                    href="/services"
                     onClick={e => {
                       e.preventDefault();
                       toggleMenu();
@@ -939,24 +937,24 @@ const AboutUs: React.FC = () => {
                     <Building className="w-5 h-5 mr-4" />
                     Services
                   </a>
-                  <a 
-                    href="#properties" 
+                  <a
+                    href="#properties"
                     onClick={toggleMenu}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Home className="w-5 h-5 mr-4" />
                     Properties
                   </a>
-                  <a 
-                    href="#gallery" 
+                  <a
+                    href="#gallery"
                     onClick={toggleMenu}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Globe className="w-5 h-5 mr-4" />
                     Gallery
                   </a>
-                  <a 
-                    href="#contact" 
+                  <a
+                    href="#contact"
                     onClick={toggleMenu}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
@@ -975,7 +973,7 @@ const AboutUs: React.FC = () => {
                 <div className="mt-8 p-6 bg-gradient-to-r from-red-50 to-emerald-50 dark:from-red-900/20 dark:to-emerald-900/20 rounded-2xl">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Ready to Get Started?</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">Book a consultation and let's discuss your project.</p>
-                  <button 
+                  <button
                     onClick={() => {
                       setIsBookingModalOpen(true);
                       setIsMenuOpen(false);
@@ -1008,12 +1006,12 @@ const AboutUs: React.FC = () => {
                   <div className="mt-8">
                     <h5 className="font-bold mb-3">Newsletter</h5>
                     <div className="flex">
-                      <input 
-                        type="email" 
+                      <input
+                        type="email"
                         placeholder="Your email"
                         className="flex-1 px-3 py-2 bg-gray-800 dark:bg-gray-950 text-white rounded-l-lg border border-gray-700 dark:border-gray-600 focus:outline-none focus:border-red-600 dark:focus:border-red-400 transition-colors duration-300"
                       />
-                      <button 
+                      <button
                         className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-r-lg transition-colors"
                       >
                         Subscribe
@@ -1041,30 +1039,45 @@ const AboutUs: React.FC = () => {
       </nav>
 
       {/* Booking Modal */}
-      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
+      <BookingModal
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        onSuccess={(msg) => {
+          setLocalToast({ message: msg || "Thanks — we'll respond within one working day.", type: 'success' });
+          window.setTimeout(() => setLocalToast(null), 3500);
+        }}
+      />
+
+      {localToast && (
+        <div className="fixed right-4 top-24 z-[9999] w-auto max-w-xs rounded-xl px-4 py-3 text-sm font-medium shadow-xl transition">
+          <div className={`rounded-lg px-4 py-2 ${localToast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>
+            {localToast.message}
+          </div>
+        </div>
+      )}
 
       {/* New Architectural Hero Section */}
-      <div 
+      <div
         ref={heroRef}
         className="relative min-h-screen pt-20 overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors duration-500"
       >
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10 dark:opacity-20">
-          <img 
-            src={patternLight} 
-            alt="Pattern" 
+          <img
+            src={patternLight}
+            alt="Pattern"
             className="w-full h-full object-cover block dark:hidden"
           />
-          <img 
-            src={patternDark} 
-            alt="Pattern" 
+          <img
+            src={patternDark}
+            alt="Pattern"
             className="w-full h-full object-cover hidden dark:block"
           />
         </div>
-        
+
         {/* Geometric Grid */}
         <div className="absolute inset-0 geo-grid"></div>
-        
+
         {/* Animated Shapes */}
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-500/30 dark:bg-red-600/20 rounded-full blur-3xl animate-pulse-glow"
           style={{
@@ -1079,7 +1092,7 @@ const AboutUs: React.FC = () => {
             animationDelay: '1s'
           }}
         ></div>
-        
+
         {/* SVG Architectural Lines */}
         <svg className="absolute inset-0 w-full h-full z-10 opacity-20 dark:opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
           <line x1="0" y1="0" x2="100" y2="100" stroke="currentColor" strokeWidth="0.2" className="animate-draw-line text-gray-600 dark:text-gray-400" />
@@ -1088,7 +1101,7 @@ const AboutUs: React.FC = () => {
           <line x1="0" y1="50" x2="100" y2="50" stroke="currentColor" strokeWidth="0.2" className="animate-draw-line delay-600 text-gray-600 dark:text-gray-400" />
           <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="0.2" className="animate-draw-line delay-800 text-red-500 dark:text-red-400" />
         </svg>
-        
+
         {/* Rotating Architectural Element */}
         <div className="absolute right-[5%] top-1/4 w-40 h-40 md:w-64 md:h-64 opacity-10 dark:opacity-20 animate-rotate-slow">
           <svg viewBox="0 0 100 100" className="w-full h-full">
@@ -1099,7 +1112,7 @@ const AboutUs: React.FC = () => {
             <path d="M50 25 L75 50 L50 75 L25 50 Z" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-gray-600 dark:text-gray-400" />
           </svg>
         </div>
-        
+
         {/* Content Container */}
         <div className="relative z-20 container mx-auto px-4 h-full flex flex-col justify-center items-center pt-16 md:pt-0">
           <div className="text-center max-w-4xl">
@@ -1109,28 +1122,28 @@ const AboutUs: React.FC = () => {
             >
               About Our Company
             </h1>
-            
+
             {/* Main Heading - UPDATED */}
-            <h1 
+            <h1
               className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-6 opacity-0 animate-slide-up-fade-in delay-200 tracking-tight"
             >
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-red-500">Strategic Builders.</span> <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-emerald-500 dark:from-emerald-400 dark:to-emerald-300">Global Negotiators. Trusted Managers.</span>
             </h1>
-            
+
             {/* Subheading - UPDATED */}
-            <p 
+            <p
               className="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-10 opacity-0 animate-slide-up-fade-in delay-300 max-w-3xl mx-auto"
             >
               We integrate real estate management, construction craftsmanship, and international business strategy to create lasting value across industries and continents.
             </p>
-            
+
             {/* Founders Section - Glassmorphic Cards */}
             <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 dark:text-white mb-12 opacity-0 animate-slide-up-fade-in delay-300">
               <span className="font-hurricane text-6xl md:text-7xl text-red-600 dark:text-red-400">Our Founders</span>
             </h2>
             <div className="flex flex-col md:flex-row justify-center gap-10 md:gap-16 mb-10 opacity-0 animate-slide-up-fade-in delay-400">
               {/* Mr. Bright */}
-              <div 
+              <div
                 ref={brightCardRef}
                 className={`glassmorphism rounded-2xl p-6 flex flex-col items-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 mr-bright-card ${brightClass}`}
                 style={{
@@ -1142,15 +1155,15 @@ const AboutUs: React.FC = () => {
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-red-600 to-red-500 blur-2xl opacity-50 z-0"></div>
                   <div className="mr-bright-image-container relative z-10">
                     {/* First image - mr-bright */}
-                    <img 
-                      src={founderBright} 
-                      alt="Mr. Bright" 
+                    <img
+                      src={founderBright}
+                      alt="Mr. Bright"
                       className={`mr-bright-image ${brightClass === 'mr-bright' ? 'visible' : 'hidden'}`}
                     />
                     {/* Second image - mr-bright2 */}
-                    <img 
-                      src={founderBright2} 
-                      alt="Mr. Bright 2" 
+                    <img
+                      src={founderBright2}
+                      alt="Mr. Bright 2"
                       className={`mr-bright-image ${brightClass === 'mr-bright2' ? 'visible' : 'hidden'}`}
                     />
                   </div>
@@ -1163,9 +1176,9 @@ const AboutUs: React.FC = () => {
                   </p>
                 </div>
               </div>
-              
+
               {/* Mrs. Winifred */}
-              <div 
+              <div
                 className="glassmorphism rounded-2xl p-6 flex flex-col items-center transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
                 style={{
                   transform: `perspective(1000px) rotateY(${(mousePosition.x - 0.5) * 10}deg) rotateX(${(mousePosition.y - 0.5) * -10}deg)`,
@@ -1174,9 +1187,9 @@ const AboutUs: React.FC = () => {
               >
                 <div className="relative w-64 h-80 mb-6">
                   <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-500 blur-2xl opacity-50"></div>
-                  <img 
-                    src={founderWinifred} 
-                    alt="Mrs. Winifred" 
+                  <img
+                    src={founderWinifred}
+                    alt="Mrs. Winifred"
                     className="w-full h-full object-cover rounded-2xl relative z-10 border-2 border-white dark:border-gray-800 shadow-lg"
                   />
                 </div>
@@ -1184,19 +1197,19 @@ const AboutUs: React.FC = () => {
                   <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Dr. Winifred Danso Agyemang</h3>
                   <p className="text-base text-emerald-600 dark:text-emerald-400 font-medium mb-3">Co-Founder & COO</p>
                   <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-                    "Adventured in the construction industry with her son to build a company with her Business Management Degree. She complimented Mr. Bright with her experience in helping the business come together. 
+                    "Adventured in the construction industry with her son to build a company with her Business Management Degree. She complimented Mr. Bright with her experience in helping the business come together.
 
-Dr. Winifred Danso Agyemang has worked with companies in the United States in Solar,  Home Construction, and Property Security. 
-The family has an unwavering determination to help many people build the home or structure of their dreams."
+                    Dr. Winifred Danso Agyemang has worked with companies in the United States in Solar,  Home Construction, and Property Security.
+                    The family has an unwavering determination to help many people build the home or structure of their dreams."
                   </p>
                 </div>
               </div>
             </div>
-            
+
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row justify-center gap-4 md:gap-6 opacity-0 animate-slide-up-fade-in delay-500">
-              
-              <button 
+
+              <button
                 onClick={() => navigate('/services')}
                 className="relative overflow-hidden group px-8 py-4 border-2 border-emerald-500 text-emerald-500 dark:text-emerald-400 dark:border-emerald-400 hover:text-white dark:hover:text-white rounded-lg font-bold transition-all duration-300"
               >
@@ -1205,9 +1218,9 @@ The family has an unwavering determination to help many people build the home or
               </button>
             </div>
           </div>
-          
+
           {/* Scroll Indicator */}
-          <div 
+          <div
             className="absolute bottom-8 left-1/2 transform -translate-x-1/2 cursor-pointer opacity-0 animate-slide-up-fade-in delay-700"
             onClick={scrollToNextSection}
           >
@@ -1228,20 +1241,19 @@ The family has an unwavering determination to help many people build the home or
               Our Story
             </h1>
           </div>
-          
+
           {/* Desktop and Mobile Layout Container */}
           <div className="flex flex-col lg:flex-row max-w-6xl mx-auto gap-8 lg:gap-16">
             {/* Content Area */}
             <div className="lg:w-2/3" {...handlers}>
               {/* Story Content */}
               <div className="relative min-h-[300px] mb-4 lg:mb-0">
-                <div 
+                <div
                   key={currentParagraph}
-                  className={`story-paragraph ${
-                    storyParagraphs[currentParagraph].isIntro 
-                      ? 'text-xl md:text-2xl font-medium' 
+                  className={`story-paragraph ${storyParagraphs[currentParagraph].isIntro
+                      ? 'text-xl md:text-2xl font-medium'
                       : 'text-lg md:text-xl'
-                  } leading-relaxed tracking-wide text-gray-700 dark:text-gray-300`}
+                    } leading-relaxed tracking-wide text-gray-700 dark:text-gray-300`}
                 >
                   {storyParagraphs[currentParagraph].text}
                 </div>
@@ -1253,11 +1265,10 @@ The family has an unwavering determination to help many people build the home or
                   <button
                     key={index}
                     onClick={() => setCurrentParagraph(index)}
-                    className={`h-1 rounded-full transition-all duration-300 ${
-                      index === currentParagraph
+                    className={`h-1 rounded-full transition-all duration-300 ${index === currentParagraph
                         ? 'story-indicator active bg-red-600 dark:bg-red-500'
                         : 'story-indicator w-4 bg-gray-300 dark:bg-gray-700'
-                    }`}
+                      }`}
                     aria-label={`Go to paragraph ${index + 1}`}
                   />
                 ))}
@@ -1270,17 +1281,16 @@ The family has an unwavering determination to help many people build the home or
                 <button
                   key={index}
                   onClick={() => setCurrentParagraph(index)}
-                  className={`w-full text-left p-4 rounded-lg transition-all duration-300 ${
-                    index === currentParagraph
+                  className={`w-full text-left p-4 rounded-lg transition-all duration-300 ${index === currentParagraph
                       ? 'bg-red-600 text-white shadow-lg'
                       : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
+                    }`}
                 >
                   <span className="block font-medium">
-                    {index === 0 ? 'Vision' : 
-                     index === 1 ? 'Leadership' :
-                     index === 2 ? 'Partnership' :
-                     'Growth'}
+                    {index === 0 ? 'Vision' :
+                      index === 1 ? 'Leadership' :
+                        index === 2 ? 'Partnership' :
+                          'Growth'}
                   </span>
                 </button>
               ))}
@@ -1441,7 +1451,7 @@ The family has an unwavering determination to help many people build the home or
 
             {/* Navigation Buttons */}
             <div className="flex items-center justify-center gap-8 mt-12">
-              <button 
+              <button
                 onClick={() => swiper?.slidePrev()}
                 className="group flex items-center gap-3 px-8 py-4 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
                 aria-label="Previous slide"
@@ -1449,7 +1459,7 @@ The family has an unwavering determination to help many people build the home or
                 <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors" />
                 <span className="font-hurricane text-3xl text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">Previous</span>
               </button>
-              <button 
+              <button
                 onClick={() => swiper?.slideNext()}
                 className="group flex items-center gap-3 px-8 py-4 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
                 aria-label="Next slide"
@@ -1469,18 +1479,18 @@ The family has an unwavering determination to help many people build the home or
             {/* Background Decorative Elements */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 rounded-full blur-3xl"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl"></div>
-            
+
             <div className="relative z-10 text-center max-w-3xl mx-auto">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6" data-aos="fade-up">
                 Building More Than Structures —<br />
                 <span className="text-red-600 dark:text-red-400">We Build Trust.</span>
               </h2>
-              
+
               <p className="text-xl text-gray-700 dark:text-gray-300 mb-8 font-newsreader" data-aos="fade-up" data-aos-delay="100">
                 At Brytwin Homes, every project is a promise — to our clients, our team, and our community. We commit to transparency, sustainability, and quality craftsmanship in everything we build.
               </p>
-              
-              <button 
+
+              <button
                 onClick={() => handleModalToggle(true)}
                 className="inline-flex items-center bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-bold transition-all transform hover:-translate-y-1 hover:shadow-xl"
                 data-aos="fade-up"
@@ -1497,16 +1507,16 @@ The family has an unwavering determination to help many people build the home or
       {/* Footer section */}
       <footer id="contact" className="bg-gray-900 dark:bg-gray-950 text-white py-16 scroll-mt-20 transition-colors duration-300">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div 
+          <div
             ref={contactSectionRef.ref}
             className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8"
           >
             {/* Company Info */}
             <div className={`col-span-1 md:col-span-2 stagger-item ${contactSectionRef.visibleItems[0] ? 'visible' : ''}`}>
               <div className="flex items-center mb-6">
-                <img 
-                  src={logo} 
-                  alt="Brytwin Homes Logo" 
+                <img
+                  src={logo}
+                  alt="Brytwin Homes Logo"
                   className="w-12 h-12 rounded-lg mr-3 object-cover"
                 />
                 <div>
@@ -1517,7 +1527,7 @@ The family has an unwavering determination to help many people build the home or
                 </div>
               </div>
               <p className="text-gray-400 dark:text-gray-500 mb-6 max-w-md transition-colors duration-300">
-                Your trusted partner in luxury real estate, construction, and property management services. 
+                Your trusted partner in luxury real estate, construction, and property management services.
                 Excellence in every project, professionalism in every interaction.
               </p>
               <div className="flex space-x-4">
@@ -1562,12 +1572,12 @@ The family has an unwavering determination to help many people build the home or
               <div className="mt-8">
                 <h5 className="font-bold mb-3">Newsletter</h5>
                 <div className="flex">
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     placeholder="Your email"
                     className="flex-1 px-3 py-2 bg-gray-800 dark:bg-gray-950 text-white rounded-l-lg border border-gray-700 dark:border-gray-600 focus:outline-none focus:border-red-600 dark:focus:border-red-400 transition-colors duration-300"
                   />
-                  <button 
+                  <button
                     className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-r-lg transition-colors"
                   >
                     Subscribe

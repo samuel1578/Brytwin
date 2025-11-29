@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react';
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: (message?: string) => void;
 }
 
-const BookingModal = ({ isOpen, onClose }: BookingModalProps) => {
+const BookingModal = ({ isOpen, onClose, onSuccess }: BookingModalProps) => {
   const [savedScrollPosition, setSavedScrollPosition] = useState(0);
 
   // Effect to handle body scroll lock when modal is open
@@ -31,6 +32,60 @@ const BookingModal = ({ isOpen, onClose }: BookingModalProps) => {
       document.body.style.width = '';
     };
   }, [isOpen, savedScrollPosition]);
+
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [serviceType, setServiceType] = useState('');
+  const [datetime, setDatetime] = useState('');
+  const [project, setProject] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [localToast, setLocalToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  useEffect(() => {
+    if (!localToast) return;
+    const timer = window.setTimeout(() => setLocalToast(null), 3500);
+    return () => window.clearTimeout(timer);
+  }, [localToast]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('https://formspree.io/f/mvgjjvoz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ fullName, email, phone, serviceType, datetime, project })
+      });
+
+      if (!response.ok) throw new Error('Submission failed');
+
+      setLocalToast({ message: "Thanks — we'll respond within one working day.", type: 'success' });
+      // Reset inputs & close
+      setFullName('');
+      setEmail('');
+      setPhone('');
+      setServiceType('');
+      setDatetime('');
+      setProject('');
+
+      // Notify parent to show a page-level success toast, if provided
+      try {
+        if (typeof onSuccess === 'function') onSuccess("Thanks — we'll respond within one working day.");
+      } catch (err) {
+        // ignore
+      }
+
+      // Close modal after a short pause so users see feedback
+      setTimeout(() => onClose(), 800);
+    } catch (err) {
+      setLocalToast({ message: 'Submission failed — please try again.', type: 'error' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const consultationModalStyle = `
     @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -352,13 +407,7 @@ const BookingModal = ({ isOpen, onClose }: BookingModalProps) => {
           <h2>Book Your Exclusive Consultation</h2>
           <p>Let's discuss your vision and how we can bring it to life with unparalleled craftsmanship and attention to detail.</p>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              // Handle form submission here
-              onClose();
-            }}
-          >
+          <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label className="form-label" htmlFor="fullName">
                 Full Name
@@ -368,6 +417,8 @@ const BookingModal = ({ isOpen, onClose }: BookingModalProps) => {
                 type="text"
                 placeholder="Enter your full name"
                 required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 className="focus:border-red-500 focus:ring-red-500"
               />
             </div>
@@ -381,6 +432,8 @@ const BookingModal = ({ isOpen, onClose }: BookingModalProps) => {
                 type="email"
                 placeholder="your.email@example.com"
                 required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="focus:border-red-500 focus:ring-red-500"
               />
             </div>
@@ -393,6 +446,8 @@ const BookingModal = ({ isOpen, onClose }: BookingModalProps) => {
                 id="phone"
                 type="tel"
                 placeholder="+233 XX XXX XXXX"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 className="focus:border-red-500 focus:ring-red-500"
               />
             </div>
@@ -404,6 +459,8 @@ const BookingModal = ({ isOpen, onClose }: BookingModalProps) => {
               <select
                 id="service"
                 required
+                value={serviceType}
+                onChange={(e) => setServiceType(e.target.value)}
                 className="focus:border-red-500 focus:ring-red-500"
               >
                 <option value="">Select Your Service</option>
@@ -423,6 +480,8 @@ const BookingModal = ({ isOpen, onClose }: BookingModalProps) => {
                 id="datetime"
                 type="datetime-local"
                 placeholder="Select your preferred time"
+                value={datetime}
+                onChange={(e) => setDatetime(e.target.value)}
                 className="focus:border-red-500 focus:ring-red-500"
               />
             </div>
@@ -436,19 +495,26 @@ const BookingModal = ({ isOpen, onClose }: BookingModalProps) => {
                 placeholder="Tell us about your dream project..."
                 rows={4}
                 required
+                value={project}
+                onChange={(e) => setProject(e.target.value)}
                 className="focus:border-red-500 focus:ring-red-500"
               ></textarea>
             </div>
 
             <div className="buttons">
-              <button type="submit" className="btn-primary">
-                Submit Request
+              <button type="submit" className={`btn-primary ${isSubmitting ? 'btn-loading' : ''}`} disabled={isSubmitting}>
+                {isSubmitting ? 'Sending...' : 'Submit Request'}
               </button>
               <button type="button" className="btn-secondary" onClick={onClose}>
                 Cancel
               </button>
             </div>
           </form>
+          {localToast && (
+            <div className={`mt-4 rounded-lg px-4 py-2 text-sm font-medium ${localToast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>
+              {localToast.message}
+            </div>
+          )}
         </div>
       </div>
     </>

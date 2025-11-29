@@ -5,12 +5,12 @@ import Services from './pages/Services';
 import Properties from './pages/Properties';
 import Gallery from './pages/Gallery';
 import ContactUs from './pages/Contact-Us';
-import { 
-  Menu, 
-  X, 
-  Phone, 
-  Mail, 
-  MapPin, 
+import {
+  Menu,
+  X,
+  Phone,
+  Mail,
+  MapPin,
   Star,
   Users,
   Home,
@@ -73,6 +73,7 @@ function MainApp() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isConsultationModalOpen, setIsConsultationModalOpen] = useState(false);
   const [savedScrollPosition, setSavedScrollPosition] = useState(0);
+  const [globalToast, setGlobalToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Effect to handle body scroll lock when modal is open
   useEffect(() => {
@@ -95,6 +96,11 @@ function MainApp() {
   // Modified modal state handler to properly manage scroll lock
   const handleModalToggle = (open: boolean) => {
     setIsConsultationModalOpen(open);
+  };
+
+  const showGlobalToast = (message: string, type: 'success' | 'error' = 'success') => {
+    setGlobalToast({ message, type });
+    window.setTimeout(() => setGlobalToast(null), 4000);
   };
 
   const navigate = useNavigate();
@@ -411,8 +417,8 @@ function MainApp() {
   const isVideoUrl = (url: string): boolean => {
     const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
     const lowerUrl = url.toLowerCase();
-    return videoExtensions.some(ext => lowerUrl.includes(ext)) || 
-           (url.includes('drive.google.com') && url.includes('/file/d/'));
+    return videoExtensions.some(ext => lowerUrl.includes(ext)) ||
+      (url.includes('drive.google.com') && url.includes('/file/d/'));
   };
 
   // Helper function to get video thumbnail from Google Drive
@@ -420,7 +426,7 @@ function MainApp() {
     try {
       if (url.includes('drive.google.com')) {
         let fileId = '';
-        
+
         if (url.includes('uc?id=')) {
           fileId = url.split('uc?id=')[1].split('&')[0];
         } else if (url.includes('/file/d/')) {
@@ -448,7 +454,7 @@ function MainApp() {
       if (url.includes('drive.google.com')) {
         // Extract file ID from various Google Drive URL formats
         let fileId = '';
-        
+
         // Format: https://drive.google.com/uc?id=FILE_ID
         if (url.includes('uc?id=')) {
           fileId = url.split('uc?id=')[1].split('&')[0];
@@ -513,10 +519,10 @@ function MainApp() {
   const aboutTitleRef = useInView<HTMLHeadingElement>({ threshold: 0.3 });
   const aboutDescRef = useInView<HTMLParagraphElement>({ threshold: 0.2 });
   const aboutButtonRef = useInView<HTMLButtonElement>({ threshold: 0.5 });
-  
+
   const contactSectionRef = useStaggeredInView<HTMLDivElement>(4, 100);
   const testimonialsRef = useInView<HTMLHeadingElement>({ threshold: 0.3 });
-  
+
   // Navigation scroll state
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -575,7 +581,7 @@ function MainApp() {
   // Hero slideshow effect for desktop only
   useEffect(() => {
     if (isPaused) return;
-    
+
     const interval = setInterval(() => {
       setHeroSlide(prev => prev === 1 ? 2 : 1);
     }, 6000); // Switch every 6 seconds
@@ -587,34 +593,34 @@ function MainApp() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      
+
       // Navigation background change
       if (currentScrollY > 100 && !isScrolled) {
         setIsScrolled(true);
       } else if (currentScrollY <= 100 && isScrolled) {
         setIsScrolled(false);
       }
-      
+
       // Mobile hero switching (only apply on mobile devices)
       if (window.innerWidth >= 768) return;
-      
+
       const heroSection = document.getElementById('home');
-      
+
       if (!heroSection) return;
-      
+
       const heroHeight = heroSection.offsetHeight;
       const heroBottom = heroSection.offsetTop + heroHeight;
-      
+
       // Check if user has scrolled past the hero section
       if (currentScrollY > heroBottom && !hasScrolledPastHero) {
         setHasScrolledPastHero(true);
       }
-      
+
       // If user is back in hero area and has previously scrolled past it
       if (currentScrollY <= heroBottom && hasScrolledPastHero) {
         const isScrollingUp = currentScrollY < lastScrollY;
         const isScrollingDown = currentScrollY > lastScrollY;
-        
+
         // Switch hero image based on scroll direction
         if (isScrollingUp && mobileHeroImage !== 2) {
           setMobileHeroImage(2);
@@ -622,7 +628,7 @@ function MainApp() {
           setMobileHeroImage(1);
         }
       }
-      
+
       setLastScrollY(currentScrollY);
     };
 
@@ -949,21 +955,21 @@ function MainApp() {
         }
       `}</style>
 
-  {/* Navigation */}
-  <nav className={`fixed top-0 left-0 right-0 w-full z-50 backdrop-blur-md shadow-xl border-b border-gray-100 dark:border-gray-800 transition-all duration-300 ${isScrolled ? 'nav-scroll-bg' : 'bg-white/95 dark:bg-gray-900/95'}`}>
+      {/* Navigation */}
+      <nav className={`fixed top-0 left-0 right-0 w-full z-50 backdrop-blur-md shadow-xl border-b border-gray-100 dark:border-gray-800 transition-all duration-300 ${isScrolled ? 'nav-scroll-bg' : 'bg-white/95 dark:bg-gray-900/95'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             {/* Logo and Company Name */}
             <div className="flex items-center space-x-4">
               {/* Logo Image */}
               <div className="flex-shrink-0">
-                <img 
-                  src={logo} 
-                  alt="Brytwin Homes Logo" 
+                <img
+                  src={logo}
+                  alt="Brytwin Homes Logo"
                   className="h-12 w-12 object-contain"
                 />
               </div>
-              
+
               {/* Company Name */}
               <div className="flex flex-col">
                 <h1 className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
@@ -982,19 +988,19 @@ function MainApp() {
                   Home
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/about" onClick={e => {e.preventDefault(); navigate && navigate('/about');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/about" onClick={e => { e.preventDefault(); navigate && navigate('/about'); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   About Us
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a 
-                  href="/services" 
-                  onClick={e => {e.preventDefault(); navigate('/services');}} 
+                <a
+                  href="/services"
+                  onClick={e => { e.preventDefault(); navigate('/services'); }}
                   className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group"
                 >
                   Services
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/properties" onClick={e => {e.preventDefault(); navigate('/properties');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/properties" onClick={e => { e.preventDefault(); navigate('/properties'); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Properties
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
@@ -1020,9 +1026,9 @@ function MainApp() {
                   Contact
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                
+
                 {/* CTA Button */}
-                <button 
+                <button
                   onClick={() => handleModalToggle(true)}
                   className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                 >
@@ -1047,33 +1053,30 @@ function MainApp() {
         </div>
 
         {/* Mobile Navigation - Full Screen Modal */}
-        <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${
-          isMenuOpen 
-            ? 'opacity-100 visible' 
+        <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${isMenuOpen
+            ? 'opacity-100 visible'
             : 'opacity-0 invisible pointer-events-none'
-        }`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}>
+          }`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}>
           {/* Backdrop */}
-          <div 
-            className={`absolute inset-0 bg-black transition-opacity duration-500 ${
-              isMenuOpen ? 'opacity-50' : 'opacity-0'
-            }`}
+          <div
+            className={`absolute inset-0 bg-black transition-opacity duration-500 ${isMenuOpen ? 'opacity-50' : 'opacity-0'
+              }`}
             onClick={toggleMenu}
             style={{ width: '100vw', height: '100vh' }}
           />
-          
+
           {/* Modal Content */}
-          <div className={`relative w-full h-full bg-white dark:bg-gray-900 transform transition-transform duration-500 ease-in-out ${
-            isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`} style={{ width: '100vw', height: '100vh', maxHeight: '100vh' }}>
+          <div className={`relative w-full h-full bg-white dark:bg-gray-900 transform transition-transform duration-500 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            }`} style={{ width: '100vw', height: '100vh', maxHeight: '100vh' }}>
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
               <div className="flex items-center space-x-3">
-                <img 
-                  src={logo} 
-                  alt="Brytwin Homes Logo" 
+                <img
+                  src={logo}
+                  alt="Brytwin Homes Logo"
                   className="h-10 w-10 object-contain"
                 />
-                
+
                 <div className="flex flex-col">
                   <h1 className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                     Brytwin Homes
@@ -1083,7 +1086,7 @@ function MainApp() {
                   </p>
                 </div>
               </div>
-              
+
               <button
                 onClick={toggleMenu}
                 className="p-3 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -1096,24 +1099,24 @@ function MainApp() {
             <div className="flex flex-col h-full overflow-y-auto" style={{ height: 'calc(100vh - 92px)' }}>
               <div className="flex-1 px-6 py-8">
                 <nav className="space-y-2">
-                  <a 
-                    href="#home" 
+                  <a
+                    href="#home"
                     onClick={toggleMenu}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-xl transition-all hover:bg-red-100 dark:hover:bg-red-900/30"
                   >
                     <Home className="w-5 h-5 mr-4" />
                     Home
                   </a>
-                  <a 
-                    href="/about" 
-                    onClick={e => {e.preventDefault(); toggleMenu(); navigate && navigate('/about');}}
+                  <a
+                    href="/about"
+                    onClick={e => { e.preventDefault(); toggleMenu(); navigate && navigate('/about'); }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Users className="w-5 h-5 mr-4" />
                     About Us
                   </a>
-                  <a 
-                    href="/services" 
+                  <a
+                    href="/services"
                     onClick={e => {
                       e.preventDefault();
                       toggleMenu();
@@ -1124,8 +1127,8 @@ function MainApp() {
                     <Building className="w-5 h-5 mr-4" />
                     Services
                   </a>
-                  <a 
-                    href="/properties" 
+                  <a
+                    href="/properties"
                     onClick={e => {
                       e.preventDefault();
                       toggleMenu();
@@ -1136,8 +1139,8 @@ function MainApp() {
                     <Home className="w-5 h-5 mr-4" />
                     Properties
                   </a>
-                  <a 
-                    href="/gallery" 
+                  <a
+                    href="/gallery"
                     onClick={e => {
                       e.preventDefault();
                       toggleMenu();
@@ -1148,8 +1151,8 @@ function MainApp() {
                     <Globe className="w-5 h-5 mr-4" />
                     Gallery
                   </a>
-                  <a 
-                    href="/contact" 
+                  <a
+                    href="/contact"
                     onClick={e => {
                       e.preventDefault();
                       toggleMenu();
@@ -1172,7 +1175,7 @@ function MainApp() {
                 <div className="mt-8 p-6 bg-gradient-to-r from-red-50 to-emerald-50 dark:from-red-900/20 dark:to-emerald-900/20 rounded-2xl">
                   <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Ready to Get Started?</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">Book a consultation and let's discuss your project.</p>
-                  <button 
+                  <button
                     onClick={() => {
                       toggleMenu();
                       handleModalToggle(true);
@@ -1221,11 +1224,23 @@ function MainApp() {
       </nav>
 
       {/* Consultation Modal */}
-      <BookingModal isOpen={isConsultationModalOpen} onClose={() => handleModalToggle(false)} />
+      <BookingModal
+        isOpen={isConsultationModalOpen}
+        onClose={() => handleModalToggle(false)}
+        onSuccess={(msg) => showGlobalToast(msg || "Thanks — we'll respond within one working day.", 'success')}
+      />
+
+      {globalToast && (
+        <div className="fixed right-4 top-24 z-[9999] w-auto max-w-xs rounded-xl px-4 py-3 text-sm font-medium shadow-xl transition">
+          <div className={`rounded-lg px-4 py-2 ${globalToast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>
+            {globalToast.message}
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
-      <section 
-        id="home" 
+      <section
+        id="home"
         className={`relative flex items-center justify-center bg-cover bg-center pt-20 hero-bg ${heroSlide === 2 ? 'slide-2' : ''} ${mobileHeroImage === 2 ? 'mobile-hero-2' : ''}`}
         style={{
           height: 'calc(70vh + 80px)',
@@ -1255,12 +1270,12 @@ function MainApp() {
 
         {/* Slideshow Indicators - Only visible on desktop */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 hidden md:flex space-x-3">
-          <button 
+          <button
             className={`w-3 h-3 rounded-full transition-all duration-300 ${heroSlide === 1 ? 'bg-white' : 'bg-white/40 hover:bg-white/60'}`}
             onClick={() => setHeroSlide(1)}
             aria-label="Show slide 1"
           />
-          <button 
+          <button
             className={`w-3 h-3 rounded-full transition-all duration-300 ${heroSlide === 2 ? 'bg-white' : 'bg-white/40 hover:bg-white/60'}`}
             onClick={() => setHeroSlide(2)}
             aria-label="Show slide 2"
@@ -1269,19 +1284,19 @@ function MainApp() {
       </section>
 
       {/* About Snippet */}
-      <section id="about" className="pt-16 pb-4 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 relative scroll-mt-20 transition-colors duration-300">        
+      <section id="about" className="pt-16 pb-4 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 relative scroll-mt-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center">
-            <h3 
+            <h3
               ref={aboutTitleRef.ref}
               className={`text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300 slide-up ${aboutTitleRef.inView ? 'in-view' : ''}`}
             >
               About <span className="font-normal font-hurricane">Brytwin Homes & Construction Ltd</span>
             </h3>
-            <p 
+            <p
               ref={aboutDescRef.ref}
               className={`text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto font-ibm-plex transition-colors duration-300 fade-in ${aboutDescRef.inView ? 'in-view' : ''}`}
-              style={{ 
+              style={{
                 lineHeight: '1.8',
                 letterSpacing: '0.01em',
                 fontWeight: '400'
@@ -1289,7 +1304,7 @@ function MainApp() {
             >
               Born with a hustling mindset but determined scope, Mr. Bright 'Last-Name' turned passion into purpose. Launching and Managing a construction company grounded in hard work, vision, and integrity. Without the industry standard university degree, he relied on hands-on experience and determination to master construction, international management, and estate management. Today, he and his team delivers projects with the same drive that started this journey: Quality, Trust, and Results that last.
             </p>
-            <button 
+            <button
               ref={aboutButtonRef.ref}
               className={`mt-6 text-red-600 dark:text-red-400 font-medium hover:text-red-700 dark:hover:text-red-300 transition-colors flex items-center justify-center mx-auto scale-in pulse-on-hover ${aboutButtonRef.inView ? 'in-view' : ''}`}
             >
@@ -1297,26 +1312,26 @@ function MainApp() {
             </button>
           </div>
         </div>
-        
+
         {/* Background decoration - same as Services section */}
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-gradient-to-br from-red-500/20 to-red-500/5 rounded-full blur-xl"></div>
         <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 rounded-full blur-xl"></div>
       </section>
-      
+
       {/* Our Services */}
       <section id="services" className="relative pt-10 pb-20 overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 scroll-mt-20 transition-colors duration-500">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10 dark:opacity-20">
           <div className="absolute inset-0 bg-[url('https://assets.website-files.com/63904f663019b0d8edf8d57c/63915f9833eeee75f4917569_pattern-light.svg')] dark:bg-[url('https://assets.website-files.com/63904f663019b0d8edf8d57c/63915f9833eeee4b73917568_pattern-dark.svg')] bg-repeat w-full h-full"></div>
         </div>
-        
+
         {/* Geometric Grid */}
         <div className="absolute inset-0 geo-grid"></div>
-        
+
         {/* Animated Shapes */}
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-red-500/30 dark:bg-red-600/20 rounded-full blur-3xl animate-pulse-glow"></div>
         <div className="absolute bottom-1/3 right-1/4 w-72 h-72 bg-emerald-500/20 dark:bg-emerald-600/20 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1s' }}></div>
-        
+
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-8">
@@ -1329,29 +1344,29 @@ function MainApp() {
           </div>
 
           {/* Services Coverflow */}
-          <div 
+          <div
             className="services-coverflow"
-            onTouchStart={handleTouchStart} 
-            onTouchMove={handleTouchMove} 
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
             <div className="coverflow-container">
               {services.map((service, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className={`service-card ${getCardClass(index)}`}
                   onClick={() => setCurrentService(index)}
                 >
                   <div className="relative h-full bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl">
                     {/* Background Image */}
                     <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent z-10"></div>
-                    <div 
+                    <div
                       className="absolute inset-0 bg-cover bg-center"
                       style={{
                         backgroundImage: `url(${service.image})`
                       }}
                     />
-                    
+
                     {/* Content */}
                     <div className="relative z-20 p-6 md:p-8 h-full flex flex-col">
                       <div className="flex-1">
@@ -1363,7 +1378,7 @@ function MainApp() {
                           {service.description}
                         </p>
                       </div>
-                      
+
                       <div className="mt-6">
                         <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center w-fit">
                           Learn More <ArrowRight className="ml-2 w-4 h-4" />
@@ -1375,10 +1390,10 @@ function MainApp() {
               ))}
             </div>
           </div>
-          
+
           {/* Navigation Buttons */}
           <div className="swiper-nav-buttons flex items-center gap-6">
-            <button 
+            <button
               onClick={prevService}
               className="group flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
               aria-label="Previous service"
@@ -1386,7 +1401,7 @@ function MainApp() {
               <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors" />
               <span className="font-hurricane text-3xl text-gray-700 dark:text-gray-300 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">Previous</span>
             </button>
-            <button 
+            <button
               onClick={nextService}
               className="group flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
               aria-label="Next service"
@@ -1396,7 +1411,7 @@ function MainApp() {
             </button>
           </div>
         </div>
-        
+
         {/* Background decoration */}
         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-gradient-to-br from-red-500/20 to-red-500/5 rounded-full blur-xl"></div>
         <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 rounded-full blur-xl"></div>
@@ -1525,11 +1540,11 @@ function MainApp() {
         </div>
       </section>
 
-      {/* Testimonials */} 
+      {/* Testimonials */}
       <section className="py-20 bg-gray-50 dark:bg-gray-800 scroll-mt-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h3 
+            <h3
               ref={testimonialsRef.ref}
               className={`text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300 slide-up ${testimonialsRef.inView ? 'in-view' : ''}`}
             >
@@ -1567,7 +1582,7 @@ function MainApp() {
           <p className="text-xl text-white mb-8">
             Book a consultation today and let's discuss how we can help you achieve your property goals
           </p>
-          <button 
+          <button
             onClick={() => handleModalToggle(true)}
             className="bg-white text-red-600 px-8 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition-colors transform hover:scale-105"
           >
@@ -1579,16 +1594,16 @@ function MainApp() {
       {/* Footer */}
       <footer id="contact" className="bg-gray-900 dark:bg-gray-950 text-white py-16 scroll-mt-20 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div 
+          <div
             ref={contactSectionRef.ref}
             className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8"
           >
             {/* Company Info */}
             <div className={`col-span-1 md:col-span-2 stagger-item ${contactSectionRef.visibleItems[0] ? 'visible' : ''}`}>
               <div className="flex items-center mb-6">
-                <img 
-                  src={logo} 
-                  alt="Brytwin Homes Logo" 
+                <img
+                  src={logo}
+                  alt="Brytwin Homes Logo"
                   className="w-12 h-12 rounded-lg mr-3 object-cover"
                 />
                 <div>
@@ -1599,7 +1614,7 @@ function MainApp() {
                 </div>
               </div>
               <p className="text-gray-400 dark:text-gray-500 mb-6 max-w-md transition-colors duration-300">
-                Your trusted partner in luxury real estate, construction, and property management services. 
+                Your trusted partner in luxury real estate, construction, and property management services.
                 Excellence in every project, professionalism in every interaction.
               </p>
               <div className="flex space-x-4">
@@ -1617,7 +1632,7 @@ function MainApp() {
                 <li><a href="#home" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Home</a></li>
                 <li><a href="#about" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">About Us</a></li>
                 <li><a href="#services" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Services</a></li>
-                <li><a href="/properties" onClick={e => {e.preventDefault(); navigate('/properties');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
+                <li><a href="/properties" onClick={e => { e.preventDefault(); navigate('/properties'); }} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
                 <li>
                   <a
                     href="/gallery"
@@ -1659,8 +1674,8 @@ function MainApp() {
               <div className="mt-8">
                 <h5 className="font-bold mb-3">Newsletter</h5>
                 <div className="flex">
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     placeholder="Your email"
                     className="flex-1 px-3 py-2 bg-gray-800 dark:bg-gray-950 text-white rounded-l-lg border border-gray-700 dark:border-gray-600 focus:outline-none focus:border-red-600 dark:focus:border-red-400 transition-colors duration-300"
                   />

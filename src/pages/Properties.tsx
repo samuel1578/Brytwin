@@ -53,6 +53,7 @@ const Properties: React.FC = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [localToast, setLocalToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const { currency, setCurrency, formatPrice, isLoading, error } = useCurrency();
   const [properties, setProperties] = useState<Property[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
@@ -65,8 +66,8 @@ const Properties: React.FC = () => {
   const isVideoUrl = (url: string): boolean => {
     const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
     const lowerUrl = url.toLowerCase();
-    return videoExtensions.some(ext => lowerUrl.includes(ext)) || 
-           (url.includes('drive.google.com') && url.includes('/file/d/'));
+    return videoExtensions.some(ext => lowerUrl.includes(ext)) ||
+      (url.includes('drive.google.com') && url.includes('/file/d/'));
   };
 
   // Helper function to get video thumbnail from Google Drive
@@ -74,7 +75,7 @@ const Properties: React.FC = () => {
     try {
       if (url.includes('drive.google.com')) {
         let fileId = '';
-        
+
         if (url.includes('uc?id=')) {
           fileId = url.split('uc?id=')[1].split('&')[0];
         } else if (url.includes('/file/d/')) {
@@ -102,7 +103,7 @@ const Properties: React.FC = () => {
       if (url.includes('drive.google.com')) {
         // Extract file ID from various Google Drive URL formats
         let fileId = '';
-        
+
         // Format: https://drive.google.com/uc?id=FILE_ID
         if (url.includes('uc?id=')) {
           fileId = url.split('uc?id=')[1].split('&')[0];
@@ -289,21 +290,21 @@ const Properties: React.FC = () => {
             {/* Desktop Navigation */}
             <div className="hidden lg:block">
               <div className="flex items-center space-x-8">
-                <a href="/" onClick={e => {e.preventDefault(); navigate('/');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Home
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/about" onClick={e => {e.preventDefault(); navigate('/about');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/about" onClick={e => { e.preventDefault(); navigate('/about'); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   About Us
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/services" onClick={e => {e.preventDefault(); navigate('/services');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/services" onClick={e => { e.preventDefault(); navigate('/services'); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Services
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
                 <a
                   href="/properties"
-                  onClick={e => {e.preventDefault(); navigate('/properties');}}
+                  onClick={e => { e.preventDefault(); navigate('/properties'); }}
                   className="relative text-red-600 dark:text-red-400 font-semibold text-sm uppercase tracking-wide hover:text-red-700 dark:hover:text-red-300 transition-colors group"
                 >
                   Properties
@@ -320,13 +321,13 @@ const Properties: React.FC = () => {
                   Gallery
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/#contact" onClick={e => {e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100);}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/#contact" onClick={e => { e.preventDefault(); navigate('/'); setTimeout(() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Contact
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
 
                 {/* CTA Button */}
-                <button 
+                <button
                   onClick={() => setIsBookingModalOpen(true)}
                   className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                 >
@@ -351,24 +352,21 @@ const Properties: React.FC = () => {
         </div>
 
         {/* Mobile Navigation - Full Screen Modal */}
-        <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${
-          isMenuOpen
+        <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${isMenuOpen
             ? 'opacity-100 visible'
             : 'opacity-0 invisible pointer-events-none'
-        }`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}>
+          }`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}>
           {/* Backdrop */}
           <div
-            className={`absolute inset-0 bg-black transition-opacity duration-500 ${
-              isMenuOpen ? 'opacity-50' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 bg-black transition-opacity duration-500 ${isMenuOpen ? 'opacity-50' : 'opacity-0'
+              }`}
             onClick={toggleMenu}
             style={{ width: '100vw', height: '100vh' }}
           />
 
           {/* Modal Content */}
-          <div className={`relative w-full h-full bg-white dark:bg-gray-900 transform transition-transform duration-500 ease-in-out ${
-            isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`} style={{ width: '100vw', height: '100vh', maxHeight: '100vh' }}>
+          <div className={`relative w-full h-full bg-white dark:bg-gray-900 transform transition-transform duration-500 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            }`} style={{ width: '100vw', height: '100vh', maxHeight: '100vh' }}>
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
               <div className="flex items-center space-x-3">
@@ -414,7 +412,7 @@ const Properties: React.FC = () => {
                   </a>
                   <a
                     href="/about"
-                    onClick={e => {e.preventDefault(); toggleMenu(); navigate('/about');}}
+                    onClick={e => { e.preventDefault(); toggleMenu(); navigate('/about'); }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Building className="w-5 h-5 mr-4" />
@@ -586,14 +584,14 @@ const Properties: React.FC = () => {
                 .split(',')
                 .map((url: string) => url.replace(/\n/g, '').trim())
                 .filter((url: string) => url && url.length > 0);
-              
+
               // Separate videos and images
               const videoUrls = exteriorUrls.filter((url: string) => isVideoUrl(url));
               const imageUrls = exteriorUrls.filter((url: string) => !isVideoUrl(url));
-              
+
               // Determine placeholder: use video thumbnail if video exists, otherwise use image
               let placeholderImage = null;
-              
+
               if (videoUrls.length > 0) {
                 // Use video thumbnail
                 const randomVideo = videoUrls[Math.floor(Math.random() * videoUrls.length)];
@@ -824,10 +822,10 @@ const Properties: React.FC = () => {
             <div>
               <h4 className="text-lg font-bold mb-6">Quick Links</h4>
               <ul className="space-y-3">
-                <li><a href="/" onClick={e => {e.preventDefault(); navigate('/');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Home</a></li>
-                <li><a href="/about" onClick={e => {e.preventDefault(); navigate('/about');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">About Us</a></li>
-                <li><a href="/services" onClick={e => {e.preventDefault(); navigate('/services');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Services</a></li>
-                <li><a href="/properties" onClick={e => {e.preventDefault(); navigate('/properties');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
+                <li><a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Home</a></li>
+                <li><a href="/about" onClick={e => { e.preventDefault(); navigate('/about'); }} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">About Us</a></li>
+                <li><a href="/services" onClick={e => { e.preventDefault(); navigate('/services'); }} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Services</a></li>
+                <li><a href="/properties" onClick={e => { e.preventDefault(); navigate('/properties'); }} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
                 <li>
                   <a
                     href="/gallery"
@@ -891,7 +889,22 @@ const Properties: React.FC = () => {
         </div>
       </footer>
 
-      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
+      <BookingModal
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        onSuccess={(msg) => {
+          setLocalToast({ message: msg || "Thanks — we'll respond within one working day.", type: 'success' });
+          window.setTimeout(() => setLocalToast(null), 3500);
+        }}
+      />
+
+      {localToast && (
+        <div className="fixed right-4 top-24 z-[9999] w-auto max-w-xs rounded-xl px-4 py-3 text-sm font-medium shadow-xl transition">
+          <div className={`rounded-lg px-4 py-2 ${localToast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>
+            {localToast.message}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -41,6 +41,7 @@ const Services: React.FC = () => {
   const [swiperInstance, setSwiperInstance] = useState<any>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [localToast, setLocalToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -258,23 +259,23 @@ const Services: React.FC = () => {
             {/* Desktop Navigation */}
             <div className="hidden lg:block">
               <div className="flex items-center space-x-8">
-                <a href="/" onClick={e => {e.preventDefault(); navigate('/');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Home
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/about" onClick={e => {e.preventDefault(); navigate('/about');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/about" onClick={e => { e.preventDefault(); navigate('/about'); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   About Us
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
                 <a
                   href="/services"
-                  onClick={e => {e.preventDefault(); navigate('/services');}}
+                  onClick={e => { e.preventDefault(); navigate('/services'); }}
                   className="relative text-red-600 dark:text-red-400 font-semibold text-sm uppercase tracking-wide hover:text-red-700 dark:hover:text-red-300 transition-colors group"
                 >
                   Services
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-100 transition-transform"></span>
                 </a>
-                <a href="/properties" onClick={e => {e.preventDefault(); navigate('/properties');}} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a href="/properties" onClick={e => { e.preventDefault(); navigate('/properties'); }} className="relative text-gray-700 dark:text-gray-300 font-semibold text-sm uppercase tracking-wide hover:text-red-600 dark:hover:text-red-400 transition-colors group">
                   Properties
                   <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
                 </a>
@@ -302,7 +303,7 @@ const Services: React.FC = () => {
                 </a>
 
                 {/* CTA Button */}
-                <button 
+                <button
                   onClick={() => setIsBookingModalOpen(true)}
                   className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-8 py-3 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                 >
@@ -327,24 +328,21 @@ const Services: React.FC = () => {
         </div>
 
         {/* Mobile Navigation - Full Screen Modal */}
-        <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${
-          isMenuOpen
+        <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${isMenuOpen
             ? 'opacity-100 visible'
             : 'opacity-0 invisible pointer-events-none'
-        }`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}>
+          }`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}>
           {/* Backdrop */}
           <div
-            className={`absolute inset-0 bg-black transition-opacity duration-500 ${
-              isMenuOpen ? 'opacity-50' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 bg-black transition-opacity duration-500 ${isMenuOpen ? 'opacity-50' : 'opacity-0'
+              }`}
             onClick={toggleMenu}
             style={{ width: '100vw', height: '100vh' }}
           />
 
           {/* Modal Content */}
-          <div className={`relative w-full h-full bg-white dark:bg-gray-900 transform transition-transform duration-500 ease-in-out ${
-            isMenuOpen ? 'translate-x-0' : 'translate-x-full'
-          }`} style={{ width: '100vw', height: '100vh', maxHeight: '100vh' }}>
+          <div className={`relative w-full h-full bg-white dark:bg-gray-900 transform transition-transform duration-500 ease-in-out ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            }`} style={{ width: '100vw', height: '100vh', maxHeight: '100vh' }}>
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
               <div className="flex items-center space-x-3">
@@ -390,7 +388,7 @@ const Services: React.FC = () => {
                   </a>
                   <a
                     href="/about"
-                    onClick={e => {e.preventDefault(); toggleMenu(); navigate('/about');}}
+                    onClick={e => { e.preventDefault(); toggleMenu(); navigate('/about'); }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Building className="w-5 h-5 mr-4" />
@@ -410,7 +408,7 @@ const Services: React.FC = () => {
                   </a>
                   <a
                     href="/properties"
-                    onClick={e => {e.preventDefault(); toggleMenu(); navigate('/properties');}}
+                    onClick={e => { e.preventDefault(); toggleMenu(); navigate('/properties'); }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Home className="w-5 h-5 mr-4" />
@@ -510,7 +508,7 @@ const Services: React.FC = () => {
           <line x1="0" y1="50" x2="100" y2="50" stroke="currentColor" strokeWidth="0.2" className="animate-draw-line delay-600 text-gray-600 dark:text-gray-400" />
           <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="0.2" className="animate-draw-line delay-800 text-red-500 dark:text-red-400" />
         </svg>
-        
+
         {/* Rotating Architectural Element */}
         <div className="absolute right-[5%] top-1/4 w-40 h-40 md:w-64 md:h-64 opacity-10 dark:opacity-20 animate-rotate-slow">
           <svg viewBox="0 0 100 100" className="w-full h-full">
@@ -521,7 +519,7 @@ const Services: React.FC = () => {
             <path d="M50 25 L75 50 L50 75 L25 50 Z" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-gray-600 dark:text-gray-400" />
           </svg>
         </div>
-        
+
         <div className="text-center text-gray-900 dark:text-white max-w-4xl mx-auto px-4 animate-fade-in-up">
           <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-slide-up">
             Our Services
@@ -560,9 +558,9 @@ const Services: React.FC = () => {
             {/* Real Estate Management Card */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 overflow-hidden hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-300 transform hover:-translate-y-2">
               <div className="relative h-64 overflow-hidden">
-                <img 
-                  src={sream} 
-                  alt="Real Estate Management" 
+                <img
+                  src={sream}
+                  alt="Real Estate Management"
                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                 />
               </div>
@@ -573,7 +571,7 @@ const Services: React.FC = () => {
                 <p className="text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-300">
                   Professional property management and sales services for luxury residential and commercial properties, ensuring optimal returns and tenant satisfaction.
                 </p>
-                <button 
+                <button
                   onClick={() => setSelectedService('real-estate')}
                   className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
                 >
@@ -586,9 +584,9 @@ const Services: React.FC = () => {
             {/* General Construction Works Card */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 overflow-hidden hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-300 transform hover:-translate-y-2">
               <div className="relative h-64 overflow-hidden">
-                <img 
-                  src={scons} 
-                  alt="General Construction Works" 
+                <img
+                  src={scons}
+                  alt="General Construction Works"
                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                 />
               </div>
@@ -599,7 +597,7 @@ const Services: React.FC = () => {
                 <p className="text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-300">
                   Complete construction services from foundation to finish, delivering quality craftsmanship and innovative building solutions for residential and commercial projects.
                 </p>
-                <button 
+                <button
                   onClick={() => setSelectedService('construction')}
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
                 >
@@ -612,9 +610,9 @@ const Services: React.FC = () => {
             {/* International Negotiations Card */}
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 overflow-hidden hover:shadow-2xl dark:hover:shadow-gray-900/70 transition-all duration-300 transform hover:-translate-y-2">
               <div className="relative h-64 overflow-hidden">
-                <img 
-                  src={sint} 
-                  alt="International Negotiations" 
+                <img
+                  src={sint}
+                  alt="International Negotiations"
                   className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
                 />
               </div>
@@ -625,7 +623,7 @@ const Services: React.FC = () => {
                 <p className="text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-300">
                   Expert international business negotiations and partnerships, facilitating cross-border deals and strategic alliances for global business expansion.
                 </p>
-                <button 
+                <button
                   onClick={() => setSelectedService('negotiations')}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
                 >
@@ -649,9 +647,9 @@ const Services: React.FC = () => {
               <SwiperSlide>
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 overflow-hidden">
                   <div className="relative h-64 overflow-hidden">
-                    <img 
-                      src={sream} 
-                      alt="Real Estate Management" 
+                    <img
+                      src={sream}
+                      alt="Real Estate Management"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -662,7 +660,7 @@ const Services: React.FC = () => {
                     <p className="text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-300">
                       Professional property management and sales services for luxury residential and commercial properties, ensuring optimal returns and tenant satisfaction.
                     </p>
-                    <button 
+                    <button
                       onClick={() => setSelectedService('real-estate')}
                       className="w-full bg-red-600 hover:bg-red-700 text-white py-3 rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
                     >
@@ -677,9 +675,9 @@ const Services: React.FC = () => {
               <SwiperSlide>
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 overflow-hidden">
                   <div className="relative h-64 overflow-hidden">
-                    <img 
-                      src={scons} 
-                      alt="General Construction Works" 
+                    <img
+                      src={scons}
+                      alt="General Construction Works"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -690,7 +688,7 @@ const Services: React.FC = () => {
                     <p className="text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-300">
                       Complete construction services from foundation to finish, delivering quality craftsmanship and innovative building solutions for residential and commercial projects.
                     </p>
-                    <button 
+                    <button
                       onClick={() => setSelectedService('construction')}
                       className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
                     >
@@ -705,9 +703,9 @@ const Services: React.FC = () => {
               <SwiperSlide>
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 overflow-hidden">
                   <div className="relative h-64 overflow-hidden">
-                    <img 
-                      src={sint} 
-                      alt="International Negotiations" 
+                    <img
+                      src={sint}
+                      alt="International Negotiations"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -718,7 +716,7 @@ const Services: React.FC = () => {
                     <p className="text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-300">
                       Expert international business negotiations and partnerships, facilitating cross-border deals and strategic alliances for global business expansion.
                     </p>
-                    <button 
+                    <button
                       onClick={() => setSelectedService('negotiations')}
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
                     >
@@ -1183,10 +1181,10 @@ const Services: React.FC = () => {
             <div>
               <h4 className="text-lg font-bold mb-6">Quick Links</h4>
               <ul className="space-y-3">
-                <li><a href="/" onClick={e => {e.preventDefault(); navigate('/');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Home</a></li>
-                <li><a href="/about" onClick={e => {e.preventDefault(); navigate('/about');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">About Us</a></li>
-                <li><a href="/services" onClick={e => {e.preventDefault(); navigate('/services');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Services</a></li>
-                <li><a href="/properties" onClick={e => {e.preventDefault(); navigate('/properties');}} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
+                <li><a href="/" onClick={e => { e.preventDefault(); navigate('/'); }} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Home</a></li>
+                <li><a href="/about" onClick={e => { e.preventDefault(); navigate('/about'); }} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">About Us</a></li>
+                <li><a href="/services" onClick={e => { e.preventDefault(); navigate('/services'); }} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Services</a></li>
+                <li><a href="/properties" onClick={e => { e.preventDefault(); navigate('/properties'); }} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
                 <li>
                   <a
                     href="/gallery"
@@ -1263,7 +1261,22 @@ const Services: React.FC = () => {
       </footer>
 
       {/* Booking Modal */}
-      <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} />
+      <BookingModal
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        onSuccess={(msg) => {
+          setLocalToast({ message: msg || "Thanks — we'll respond within one working day.", type: 'success' });
+          window.setTimeout(() => setLocalToast(null), 3500);
+        }}
+      />
+
+      {localToast && (
+        <div className="fixed right-4 top-24 z-[9999] w-auto max-w-xs rounded-xl px-4 py-3 text-sm font-medium shadow-xl transition">
+          <div className={`rounded-lg px-4 py-2 ${localToast.type === 'success' ? 'bg-emerald-600 text-white' : 'bg-red-600 text-white'}`}>
+            {localToast.message}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
