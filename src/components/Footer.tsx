@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useStaggeredInView } from '../hooks/useInView';
-import { 
-  Phone, 
-  Mail, 
+import {
+  Phone,
+  Mail,
   MapPin,
   Facebook,
   Twitter,
@@ -10,24 +10,37 @@ import {
   Linkedin
 } from 'lucide-react';
 import logo from '../logo.jpeg';
+import { CONTACTS } from '../config/contacts';
+import ContactChooser from './ContactChooser';
+import { useState } from 'react';
 
 const Footer = () => {
   const navigate = useNavigate();
   const contactSectionRef = useStaggeredInView<HTMLDivElement>(4, 100);
 
+  const [contactChooser, setContactChooser] = useState<{
+    open: boolean;
+    label: string;
+    telHref: string;
+    waHref: string;
+  } | null>(null);
+
+  const openContactChooser = (label: string, telHref: string, waHref: string) => setContactChooser({ open: true, label, telHref, waHref });
+  const closeContactChooser = () => setContactChooser(null);
+
   return (
     <footer id="contact" className="bg-gray-900 dark:bg-gray-950 text-white py-16 scroll-mt-20 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div 
+        <div
           ref={contactSectionRef.ref}
           className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8"
         >
           {/* Company Info */}
           <div className={`col-span-1 md:col-span-2 stagger-item ${contactSectionRef.visibleItems[0] ? 'visible' : ''}`}>
             <div className="flex items-center mb-6">
-              <img 
-                src={logo} 
-                alt="Brytwin Homes Logo" 
+              <img
+                src={logo}
+                alt="Brytwin Homes Logo"
                 className="w-12 h-12 rounded-lg mr-3 object-cover"
               />
               <div>
@@ -38,7 +51,7 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-gray-400 dark:text-gray-500 mb-6 max-w-md transition-colors duration-300">
-              Your trusted partner in luxury real estate, construction, and property management services. 
+              Your trusted partner in luxury real estate, construction, and property management services.
               Excellence in every project, professionalism in every interaction.
             </p>
             <div className="flex space-x-4">
@@ -90,7 +103,21 @@ const Footer = () => {
             <div className="space-y-4">
               <div className="flex items-center">
                 <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
-                <span className="text-gray-400 dark:text-gray-500">(+233) 55 805 6649</span>
+                <button
+                  className="text-gray-400 dark:text-gray-500 hover:text-white underline decoration-transparent hover:decoration-emerald-400"
+                  onClick={(e) => { e.preventDefault(); openContactChooser(CONTACTS.GHANA.label, CONTACTS.GHANA.telHref, CONTACTS.GHANA.waHref); }}
+                >
+                  {CONTACTS.GHANA.display}
+                </button>
+              </div>
+              <div className="flex items-center">
+                <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
+                <button
+                  className="text-gray-400 dark:text-gray-500 hover:text-white underline decoration-transparent hover:decoration-emerald-400"
+                  onClick={(e) => { e.preventDefault(); openContactChooser(CONTACTS.US.label, CONTACTS.US.telHref, CONTACTS.US.waHref); }}
+                >
+                  {CONTACTS.US.display}
+                </button>
               </div>
               <div className="flex items-center">
                 <Mail className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
@@ -106,8 +133,8 @@ const Footer = () => {
             <div className="mt-8">
               <h5 className="font-bold mb-3">Newsletter</h5>
               <div className="flex">
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   placeholder="Your email"
                   className="flex-1 px-3 py-2 bg-gray-800 dark:bg-gray-950 text-white rounded-l-lg border border-gray-700 dark:border-gray-600 focus:outline-none focus:border-red-600 dark:focus:border-red-400 transition-colors duration-300"
                 />
@@ -122,10 +149,19 @@ const Footer = () => {
         {/* Footer Bottom Text */}
         <div className="border-t border-gray-800 dark:border-gray-600 pt-8 text-center">
           <p className="text-gray-400 dark:text-gray-500 transition-colors duration-300">
-            © 2024 Brytwin Homes & Construction Limited. All rights reserved.
+            © 2025 Brytwin Homes & Construction Limited. All rights reserved.
           </p>
         </div>
       </div>
+      {contactChooser && (
+        <ContactChooser
+          isOpen={!!contactChooser}
+          label={contactChooser?.label}
+          telHref={contactChooser?.telHref}
+          waHref={contactChooser?.waHref}
+          onClose={closeContactChooser}
+        />
+      )}
     </footer>
   );
 };

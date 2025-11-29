@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Seo from '../components/Seo';
 import { useNavigate } from 'react-router-dom';
 import {
   Menu,
@@ -21,6 +22,8 @@ import { CurrencyCode, useCurrency } from '../contexts/CurrencyContext';
 import logo from '../logo.jpeg';
 import { ThemeToggle } from '../components/ThemeToggle';
 import BookingModal from '../components/BookingModal';
+import ContactChooser from '../components/ContactChooser';
+import { CONTACTS } from '../config/contacts';
 
 interface Property {
   ID: string;
@@ -58,9 +61,17 @@ const Properties: React.FC = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [contactChooser, setContactChooser] = useState<{
+    open: boolean;
+    label: string;
+    telHref: string;
+    waHref: string;
+  } | null>(null);
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const openContactChooser = (label: string, telHref: string, waHref: string) => setContactChooser({ open: true, label, telHref, waHref });
+  const closeContactChooser = () => setContactChooser(null);
 
   // Helper function to check if URL is a video
   const isVideoUrl = (url: string): boolean => {
@@ -353,8 +364,8 @@ const Properties: React.FC = () => {
 
         {/* Mobile Navigation - Full Screen Modal */}
         <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${isMenuOpen
-            ? 'opacity-100 visible'
-            : 'opacity-0 invisible pointer-events-none'
+          ? 'opacity-100 visible'
+          : 'opacity-0 invisible pointer-events-none'
           }`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}>
           {/* Backdrop */}
           <div
@@ -491,7 +502,12 @@ const Properties: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <Phone className="w-4 h-4 mr-3 text-red-600 dark:text-red-400" />
-                      <span className="text-sm">(+233) 55 805 6649</span>
+                      <button
+                        onClick={(e) => { e.preventDefault(); openContactChooser(CONTACTS.GHANA.label, CONTACTS.GHANA.telHref, CONTACTS.GHANA.waHref); }}
+                        className="text-sm text-gray-700 dark:text-gray-200 hover:text-red-600 dark:hover:text-red-400 underline decoration-transparent hover:decoration-emerald-400"
+                      >
+                        {CONTACTS.GHANA.display}
+                      </button>
                     </div>
                     <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <Mail className="w-4 h-4 mr-3 text-red-600 dark:text-red-400" />
@@ -514,7 +530,7 @@ const Properties: React.FC = () => {
                     <Instagram className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
                     <Linkedin className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">© 2024 Brytwin Homes</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">© 2025 Brytwin Homes</p>
                 </div>
               </div>
             </div>
@@ -522,6 +538,7 @@ const Properties: React.FC = () => {
         </div>
       </nav>
 
+      <Seo title="Properties" description="Browse our available properties and listings from Brytwin Homes." image="/og/properties.jpg" />
       {/* Placeholder Hero Section */}
       <section className="relative flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 pt-20 h-[50vh]">
         <div className="text-center text-gray-900 dark:text-white max-w-4xl mx-auto px-4 animate-fade-in-up">
@@ -618,6 +635,7 @@ const Properties: React.FC = () => {
                   {placeholderImage ? (
                     <div className="w-full h-64 overflow-hidden bg-gray-200 dark:bg-gray-700">
                       <img
+                        loading="lazy"
                         src={placeholderImage}
                         alt={property.Title}
                         className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
@@ -847,11 +865,21 @@ const Properties: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-center">
                   <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
-                  <span className="text-gray-400 dark:text-gray-500">(+1) 904 767-3657</span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); openContactChooser(CONTACTS.US.label, CONTACTS.US.telHref, CONTACTS.US.waHref); }}
+                    className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors underline decoration-transparent hover:decoration-emerald-400"
+                  >
+                    {CONTACTS.US.display}
+                  </button>
                 </div>
                 <div className="flex items-center">
                   <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
-                  <span className="text-gray-400 dark:text-gray-500">(+233) 55 805 6649</span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); openContactChooser(CONTACTS.GHANA.label, CONTACTS.GHANA.telHref, CONTACTS.GHANA.waHref); }}
+                    className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors underline decoration-transparent hover:decoration-emerald-400"
+                  >
+                    {CONTACTS.GHANA.display}
+                  </button>
                 </div>
                 <div className="flex items-center">
                   <Mail className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
@@ -883,7 +911,7 @@ const Properties: React.FC = () => {
           {/* Footer Bottom Text */}
           <div className="border-t border-gray-800 dark:border-gray-600 pt-8 text-center">
             <p className="text-gray-400 dark:text-gray-500 transition-colors duration-300">
-              © 2024 Brytwin Homes & Construction Limited. All rights reserved.
+              © 2025 Brytwin Homes & Construction Limited. All rights reserved.
             </p>
           </div>
         </div>
@@ -905,6 +933,13 @@ const Properties: React.FC = () => {
           </div>
         </div>
       )}
+      <ContactChooser
+        isOpen={!!contactChooser}
+        label={contactChooser?.label}
+        telHref={contactChooser?.telHref}
+        waHref={contactChooser?.waHref}
+        onClose={closeContactChooser}
+      />
     </div>
   );
 };

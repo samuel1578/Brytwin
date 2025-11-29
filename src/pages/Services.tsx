@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Seo from '../components/Seo';
 import { useNavigate } from 'react-router-dom';
 import {
   Menu,
@@ -27,6 +28,8 @@ import { ThemeToggle } from '../components/ThemeToggle';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCards } from 'swiper/modules';
 import BookingModal from '../components/BookingModal';
+import ContactChooser from '../components/ContactChooser';
+import { CONTACTS } from '../config/contacts';
 import 'swiper/css';
 import 'swiper/css/effect-cards';
 
@@ -41,10 +44,18 @@ const Services: React.FC = () => {
   const [swiperInstance, setSwiperInstance] = useState<any>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [contactChooser, setContactChooser] = useState<{
+    open: boolean;
+    label: string;
+    telHref: string;
+    waHref: string;
+  } | null>(null);
   const [localToast, setLocalToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const openContactChooser = (label: string, telHref: string, waHref: string) => setContactChooser({ open: true, label, telHref, waHref });
+  const closeContactChooser = () => setContactChooser(null);
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 relative transition-colors duration-300">
@@ -57,9 +68,6 @@ const Services: React.FC = () => {
 
         /* Smooth scroll behavior */
         html {
-          scroll-behavior: smooth;
-        }
-
         /* Adjust scroll padding to account for fixed navbar */
         html {
           scroll-padding-top: 80px;
@@ -167,11 +175,9 @@ const Services: React.FC = () => {
         }
         .animate-slide-up {
           animation: slide-up 1s ease-out forwards;
-          opacity: 0;
         }
         .animate-bounce-in {
           animation: bounce-in 0.8s ease-out forwards;
-          opacity: 0;
         }
         
         .animate-draw-line {
@@ -329,8 +335,8 @@ const Services: React.FC = () => {
 
         {/* Mobile Navigation - Full Screen Modal */}
         <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${isMenuOpen
-            ? 'opacity-100 visible'
-            : 'opacity-0 invisible pointer-events-none'
+          ? 'opacity-100 visible'
+          : 'opacity-0 invisible pointer-events-none'
           }`} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, width: '100vw', height: '100vh' }}>
           {/* Backdrop */}
           <div
@@ -490,7 +496,7 @@ const Services: React.FC = () => {
                     <Instagram className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
                     <Linkedin className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">© 2024 Brytwin Homes</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">© 2025 Brytwin Homes</p>
                 </div>
               </div>
             </div>
@@ -499,9 +505,10 @@ const Services: React.FC = () => {
       </nav>
 
       {/* Placeholder Hero Section */}
+      <Seo title="Services" description="Comprehensive real estate, construction, and international negotiation services from Brytwin Homes" image="/og/services.jpg" />
       <section className="relative flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 pt-20 h-[60vh] md:min-h-screen geo-grid">
         {/* SVG Architectural Lines */}
-        <svg className="absolute inset-0 w-full h-full z-10 opacity-20 dark:opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <svg className="absolute inset-0 w-full h-full z-0 opacity-20 dark:opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">
           <line x1="0" y1="0" x2="100" y2="100" stroke="currentColor" strokeWidth="0.2" className="animate-draw-line text-gray-600 dark:text-gray-400" />
           <line x1="100" y1="0" x2="0" y2="100" stroke="currentColor" strokeWidth="0.2" className="animate-draw-line delay-200 text-gray-600 dark:text-gray-400" />
           <line x1="50" y1="0" x2="50" y2="100" stroke="currentColor" strokeWidth="0.2" className="animate-draw-line delay-400 text-gray-600 dark:text-gray-400" />
@@ -520,14 +527,14 @@ const Services: React.FC = () => {
           </svg>
         </div>
 
-        <div className="text-center text-gray-900 dark:text-white max-w-4xl mx-auto px-4 animate-fade-in-up">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-slide-up">
+        <div className="relative z-30 text-center text-white max-w-4xl mx-auto px-4 animate-fade-in-up">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-slide-up drop-shadow-lg">
             Our Services
           </h1>
-          <h2 className="text-2xl md:text-4xl font-semibold mb-4 text-red-600 dark:text-red-400 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <h2 className="text-2xl md:text-4xl font-semibold mb-4 text-red-400 animate-slide-up drop-shadow-md" style={{ animationDelay: '0.1s' }}>
             Comprehensive Solutions Under One Roof
           </h2>
-          <p className="text-lg md:text-xl mb-8 text-gray-600 dark:text-gray-400 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <p className="text-lg md:text-xl mb-8 text-gray-300 animate-slide-up drop-shadow" style={{ animationDelay: '0.2s' }}>
             From real estate management to international negotiations, we deliver value through expertise and trust.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style={{ animationDelay: '0.4s' }}>
@@ -922,7 +929,11 @@ const Services: React.FC = () => {
             >
               Contact Us
             </button>
-            <button className="border-2 border-gray-600 dark:border-gray-400 text-gray-900 dark:text-white hover:bg-gray-600 dark:hover:bg-gray-400 hover:text-white dark:hover:text-gray-900 px-12 py-5 rounded-xl text-xl font-bold uppercase tracking-wide transition-all animate-bounce-in" style={{ animationDelay: '0.1s' }}>
+            <button
+              onClick={() => setIsBookingModalOpen(true)}
+              className="border-2 border-gray-600 dark:border-gray-400 text-gray-900 dark:text-white hover:bg-gray-600 dark:hover:bg-gray-400 hover:text-white dark:hover:text-gray-900 px-12 py-5 rounded-xl text-xl font-bold uppercase tracking-wide transition-all animate-bounce-in"
+              style={{ animationDelay: '0.1s' }}
+            >
               Book Consultation
             </button>
           </div>
@@ -1098,7 +1109,7 @@ const Services: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Phone</p>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">(+233) 55 805 6649</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{CONTACTS.GHANA.display}</p>
                   </div>
                 </div>
 
@@ -1218,11 +1229,21 @@ const Services: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-center">
                   <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
-                  <span className="text-gray-400 dark:text-gray-500">(+1 (904) 767-3657)</span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); openContactChooser('US Office', 'tel:+19047673657', 'https://wa.me/19047673657'); }}
+                    className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors underline decoration-transparent hover:decoration-emerald-400"
+                  >
+                    (+1 (904) 767-3657)
+                  </button>
                 </div>
                 <div className="flex items-center">
                   <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
-                  <span className="text-gray-400 dark:text-gray-500">(+233) 55 805 6649</span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); openContactChooser('Ghana Office', 'tel:+233558056649', 'https://wa.me/233558056649'); }}
+                    className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors underline decoration-transparent hover:decoration-emerald-400"
+                  >
+                    {CONTACTS.GHANA.display}
+                  </button>
                 </div>
                 <div className="flex items-center">
                   <Mail className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
@@ -1254,7 +1275,7 @@ const Services: React.FC = () => {
           {/* Footer Bottom Text */}
           <div className="border-t border-gray-800 dark:border-gray-600 pt-8 text-center">
             <p className="text-gray-400 dark:text-gray-500 transition-colors duration-300">
-              © 2024 Brytwin Homes & Construction Limited. All rights reserved.
+              © 2025 Brytwin Homes & Construction Limited. All rights reserved.
             </p>
           </div>
         </div>
@@ -1277,6 +1298,13 @@ const Services: React.FC = () => {
           </div>
         </div>
       )}
+      <ContactChooser
+        isOpen={!!contactChooser}
+        label={contactChooser?.label}
+        telHref={contactChooser?.telHref}
+        waHref={contactChooser?.waHref}
+        onClose={closeContactChooser}
+      />
     </div>
   );
 };

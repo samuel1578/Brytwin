@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useContext } from "react";
+import Seo from './Seo';
 import { useNavigate } from 'react-router-dom';
 import BookingModal from './BookingModal';
 import {
@@ -20,11 +21,15 @@ import {
   ChevronRight,
   ArrowRight
 } from 'lucide-react';
+// MessageCircle removed - now used inside ContactChooser component
+import ContactChooser from './ContactChooser';
+import { CONTACTS } from '../config/contacts';
 import constructionImg from '../construction.jpg';
 import estateImg from '../estate.jpg';
 import logo from '../logo.jpeg';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { useStaggeredInView } from '../hooks/useInView';
+import { BookingModalContext } from '../contexts/BookingModalContext';
 import { useSwipeable } from 'react-swipeable';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -55,7 +60,17 @@ const AboutUs: React.FC = () => {
 
   // Booking modal state
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const { openBookingModal } = useContext(BookingModalContext);
   const [localToast, setLocalToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [contactChooser, setContactChooser] = useState<{
+    open: boolean;
+    label: string;
+    telHref: string;
+    waHref: string;
+  } | null>(null);
+
+  const openContactChooser = (label: string, telHref: string, waHref: string) => setContactChooser({ open: true, label, telHref, waHref });
+  const closeContactChooser = () => setContactChooser(null);
 
   // Animation states
   const [, setAnimate] = useState(false);
@@ -166,11 +181,10 @@ const AboutUs: React.FC = () => {
     trackMouse: true
   });
 
-  const handleModalToggle = (isOpen: boolean): void => {
-    setIsBookingModalOpen(isOpen);
-  };
+  // local booking modal state managed here for page-specific interactions
   return (
     <div className="min-h-screen w-screen overflow-x-hidden bg-white dark:bg-gray-900 relative transition-colors duration-300">
+      <Seo title="About Us" description="Learn more about Brytwin Homes, our leadership, mission, and growth story" image="/og/about.jpg" />
       {/* Add custom animations */}
       <style>{`
         /* import Tangerine font */
@@ -860,8 +874,8 @@ const AboutUs: React.FC = () => {
 
         {/* Mobile Navigation (full implementation copied from App.tsx) */}
         <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${isMenuOpen
-            ? 'opacity-100 visible'
-            : 'opacity-0 invisible pointer-events-none'
+          ? 'opacity-100 visible'
+          : 'opacity-0 invisible pointer-events-none'
           }`}>
           {/* Backdrop */}
           <div
@@ -990,7 +1004,7 @@ const AboutUs: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <Phone className="w-4 h-4 mr-3 text-red-600 dark:text-red-400" />
-                      <span className="text-sm">(+233) 55 805 6649</span>
+                      <span className="text-sm">{CONTACTS.GHANA.display}</span>
                     </div>
                     <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <Mail className="w-4 h-4 mr-3 text-red-600 dark:text-red-400" />
@@ -1030,7 +1044,7 @@ const AboutUs: React.FC = () => {
                     <Instagram className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
                     <Linkedin className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">© 2024 Brytwin Homes</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">© 2025 Brytwin Homes</p>
                 </div>
               </div>
             </div>
@@ -1251,8 +1265,8 @@ const AboutUs: React.FC = () => {
                 <div
                   key={currentParagraph}
                   className={`story-paragraph ${storyParagraphs[currentParagraph].isIntro
-                      ? 'text-xl md:text-2xl font-medium'
-                      : 'text-lg md:text-xl'
+                    ? 'text-xl md:text-2xl font-medium'
+                    : 'text-lg md:text-xl'
                     } leading-relaxed tracking-wide text-gray-700 dark:text-gray-300`}
                 >
                   {storyParagraphs[currentParagraph].text}
@@ -1266,8 +1280,8 @@ const AboutUs: React.FC = () => {
                     key={index}
                     onClick={() => setCurrentParagraph(index)}
                     className={`h-1 rounded-full transition-all duration-300 ${index === currentParagraph
-                        ? 'story-indicator active bg-red-600 dark:bg-red-500'
-                        : 'story-indicator w-4 bg-gray-300 dark:bg-gray-700'
+                      ? 'story-indicator active bg-red-600 dark:bg-red-500'
+                      : 'story-indicator w-4 bg-gray-300 dark:bg-gray-700'
                       }`}
                     aria-label={`Go to paragraph ${index + 1}`}
                   />
@@ -1282,8 +1296,8 @@ const AboutUs: React.FC = () => {
                   key={index}
                   onClick={() => setCurrentParagraph(index)}
                   className={`w-full text-left p-4 rounded-lg transition-all duration-300 ${index === currentParagraph
-                      ? 'bg-red-600 text-white shadow-lg'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    ? 'bg-red-600 text-white shadow-lg'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                 >
                   <span className="block font-medium">
@@ -1491,7 +1505,7 @@ const AboutUs: React.FC = () => {
               </p>
 
               <button
-                onClick={() => handleModalToggle(true)}
+                onClick={() => openBookingModal?.()}
                 className="inline-flex items-center bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-bold transition-all transform hover:-translate-y-1 hover:shadow-xl"
                 data-aos="fade-up"
                 data-aos-delay="200"
@@ -1556,7 +1570,21 @@ const AboutUs: React.FC = () => {
               <div className="space-y-4">
                 <div className="flex items-center">
                   <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
-                  <span className="text-gray-400 dark:text-gray-500">(+233) 55 805 6649</span>
+                  <button
+                    className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors underline decoration-transparent hover:decoration-emerald-400"
+                    onClick={(e) => { e.preventDefault(); openContactChooser(CONTACTS.GHANA.label, CONTACTS.GHANA.telHref, CONTACTS.GHANA.waHref); }}
+                  >
+                    (+233) 55 805 6649
+                  </button>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
+                  <button
+                    className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors underline decoration-transparent hover:decoration-emerald-400"
+                    onClick={(e) => { e.preventDefault(); openContactChooser(CONTACTS.US.label, CONTACTS.US.telHref, CONTACTS.US.waHref); }}
+                  >
+                    (+1) 904 767 3657
+                  </button>
                 </div>
                 <div className="flex items-center">
                   <Mail className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
@@ -1590,11 +1618,18 @@ const AboutUs: React.FC = () => {
           {/* Copyright */}
           <div className="border-t border-gray-800 dark:border-gray-600 pt-8 text-center">
             <p className="text-gray-400 dark:text-gray-500 transition-colors duration-300">
-              © 2024 Brytwin Homes & Construction Limited. All rights reserved.
+              © 2025 Brytwin Homes & Construction Limited. All rights reserved.
             </p>
           </div>
         </div>
       </footer>
+      <ContactChooser
+        isOpen={!!contactChooser}
+        label={contactChooser?.label}
+        telHref={contactChooser?.telHref}
+        waHref={contactChooser?.waHref}
+        onClose={closeContactChooser}
+      />
     </div>
   );
 };

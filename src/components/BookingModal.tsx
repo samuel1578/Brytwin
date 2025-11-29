@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -33,13 +36,43 @@ const BookingModal = ({ isOpen, onClose, onSuccess }: BookingModalProps) => {
     };
   }, [isOpen, savedScrollPosition]);
 
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [serviceType, setServiceType] = useState('');
-  const [datetime, setDatetime] = useState('');
-  const [project, setProject] = useState('');
+  useEffect(() => {
+    if (isOpen) {
+      // focus first form field for accessibility
+      const firstInput = document.querySelector('.modal-content input[name="fullName"], .modal-content input, .modal-content select, .modal-content textarea') as HTMLElement | null;
+      firstInput?.focus();
+    }
+  }, [isOpen]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // ref intentionally omitted; using DOM focus on validation error
+
+  const schema = z.object({
+    fullName: z.string().min(1, 'Please enter your full name'),
+    email: z.string().email('Please enter a valid email address'),
+    phone: z.string().optional(),
+    serviceType: z.string().min(1, 'Please select a service type'),
+    datetime: z.string().optional(),
+    project: z.string().min(10, 'Tell us about the project (at least 10 chars)'),
+    website: z.string().optional().max(0)
+  });
+
+  type BookingForm = {
+    fullName: string;
+    email: string;
+    phone?: string;
+    serviceType: string;
+    datetime?: string;
+    project: string;
+    website?: string;
+  };
+
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<BookingForm>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      fullName: '', email: '', phone: '', serviceType: '', datetime: '', project: '', website: ''
+    }
+  });
   const [localToast, setLocalToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
@@ -48,43 +81,33 @@ const BookingModal = ({ isOpen, onClose, onSuccess }: BookingModalProps) => {
     return () => window.clearTimeout(timer);
   }, [localToast]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: BookingForm) => {
+    // Honeypot
+    if (data.website && data.website.trim().length > 0) return;
     if (isSubmitting) return;
     setIsSubmitting(true);
-
     try {
       const response = await fetch('https://formspree.io/f/mvgjjvoz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ fullName, email, phone, serviceType, datetime, project })
+        body: JSON.stringify({ fullName: data.fullName, email: data.email, phone: data.phone, serviceType: data.serviceType, datetime: data.datetime, project: data.project })
       });
-
       if (!response.ok) throw new Error('Submission failed');
-
       setLocalToast({ message: "Thanks — we'll respond within one working day.", type: 'success' });
-      // Reset inputs & close
-      setFullName('');
-      setEmail('');
-      setPhone('');
-      setServiceType('');
-      setDatetime('');
-      setProject('');
-
-      // Notify parent to show a page-level success toast, if provided
-      try {
-        if (typeof onSuccess === 'function') onSuccess("Thanks — we'll respond within one working day.");
-      } catch (err) {
-        // ignore
-      }
-
-      // Close modal after a short pause so users see feedback
+      reset();
+      if (typeof onSuccess === 'function') onSuccess("Thanks — we'll respond within one working day.");
       setTimeout(() => onClose(), 800);
     } catch (err) {
       setLocalToast({ message: 'Submission failed — please try again.', type: 'error' });
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const onErrors = (errors: any) => {
+    const firstKey = Object.keys(errors)[0];
+    const el = document.querySelector(`[name="${firstKey}"]`) as HTMLElement | null;
+    if (el) el.focus();
   };
 
   const consultationModalStyle = `
@@ -399,15 +422,18 @@ const BookingModal = ({ isOpen, onClose, onSuccess }: BookingModalProps) => {
       <style>{consultationModalStyle}</style>
       <div
         className={`consultation-modal ${isOpen ? 'open' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="consultation-title"
         onClick={(e) => {
           if (e.target === e.currentTarget) onClose();
         }}
       >
         <div className="modal-content">
-          <h2>Book Your Exclusive Consultation</h2>
+          <h2 id="consultation-title">Book Your Exclusive Consultation</h2>
           <p>Let's discuss your vision and how we can bring it to life with unparalleled craftsmanship and attention to detail.</p>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit(onSubmit, onErrors)} noValidate>
             <div className="form-group">
               <label className="form-label" htmlFor="fullName">
                 Full Name
@@ -416,11 +442,12 @@ const BookingModal = ({ isOpen, onClose, onSuccess }: BookingModalProps) => {
                 id="fullName"
                 type="text"
                 placeholder="Enter your full name"
-                required
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                aria-invalid={errors.fullName ? 'true' : 'false'}
+                aria-describedby={errors.fullName ? 'err-fullName' : undefined}
+                {...register('fullName')}
                 className="focus:border-red-500 focus:ring-red-500"
               />
+              {errors.fullName && <div id="err-fullName" className="text-sm text-red-600 mt-1">{errors.fullName.message}</div>}
             </div>
 
             <div className="form-group">
@@ -431,11 +458,12 @@ const BookingModal = ({ isOpen, onClose, onSuccess }: BookingModalProps) => {
                 id="email"
                 type="email"
                 placeholder="your.email@example.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                aria-invalid={errors.email ? 'true' : 'false'}
+                aria-describedby={errors.email ? 'err-email' : undefined}
+                {...register('email')}
                 className="focus:border-red-500 focus:ring-red-500"
               />
+              {errors.email && <div id="err-email" className="text-sm text-red-600 mt-1">{errors.email.message}</div>}
             </div>
 
             <div className="form-group">
@@ -446,10 +474,12 @@ const BookingModal = ({ isOpen, onClose, onSuccess }: BookingModalProps) => {
                 id="phone"
                 type="tel"
                 placeholder="+233 XX XXX XXXX"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                aria-invalid={errors.phone ? 'true' : 'false'}
+                aria-describedby={errors.phone ? 'err-phone' : undefined}
+                {...register('phone')}
                 className="focus:border-red-500 focus:ring-red-500"
               />
+              {errors.phone && <div id="err-phone" className="text-sm text-red-600 mt-1">{errors.phone.message}</div>}
             </div>
 
             <div className="form-group">
@@ -459,8 +489,9 @@ const BookingModal = ({ isOpen, onClose, onSuccess }: BookingModalProps) => {
               <select
                 id="service"
                 required
-                value={serviceType}
-                onChange={(e) => setServiceType(e.target.value)}
+                aria-invalid={errors.serviceType ? 'true' : 'false'}
+                aria-describedby={errors.serviceType ? 'err-serviceType' : undefined}
+                {...register('serviceType')}
                 className="focus:border-red-500 focus:ring-red-500"
               >
                 <option value="">Select Your Service</option>
@@ -480,10 +511,12 @@ const BookingModal = ({ isOpen, onClose, onSuccess }: BookingModalProps) => {
                 id="datetime"
                 type="datetime-local"
                 placeholder="Select your preferred time"
-                value={datetime}
-                onChange={(e) => setDatetime(e.target.value)}
+                aria-invalid={errors.datetime ? 'true' : 'false'}
+                aria-describedby={errors.datetime ? 'err-datetime' : undefined}
+                {...register('datetime')}
                 className="focus:border-red-500 focus:ring-red-500"
               />
+              {errors.datetime && <div id="err-datetime" className="text-sm text-red-600 mt-1">{errors.datetime.message}</div>}
             </div>
 
             <div className="form-group">
@@ -495,10 +528,15 @@ const BookingModal = ({ isOpen, onClose, onSuccess }: BookingModalProps) => {
                 placeholder="Tell us about your dream project..."
                 rows={4}
                 required
-                value={project}
-                onChange={(e) => setProject(e.target.value)}
+                aria-invalid={errors.project ? 'true' : 'false'}
+                aria-describedby={errors.project ? 'err-project' : undefined}
+                {...register('project')}
                 className="focus:border-red-500 focus:ring-red-500"
               ></textarea>
+              {errors.project && <div id="err-project" className="text-sm text-red-600 mt-1">{errors.project.message}</div>}
+
+              {/* Honeypot */}
+              <input type="text" name="website" autoComplete="off" className="hidden" {...register('website')} />
             </div>
 
             <div className="buttons">

@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Phone, Mail, MapPin, Clock, Send, Building2, Linkedin, Facebook, Twitter, Instagram } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Seo from '../components/Seo';
+import { Phone, Mail, MapPin, Clock, Send, Building2, Linkedin, Facebook, Twitter, Instagram, MessageCircle } from 'lucide-react';
 import Layout from '../components/Layout';
 import mrBright from '../mr-bright.png';
 import msWin from '../ms-win.jpeg';
 import logo from '../logo.jpeg';
+import { CONTACTS } from '../config/contacts';
 
 type ContactFormState = {
 	fullName: string;
 	email: string;
-	phone: string;
+	phone?: string;
 	projectType: string;
 	message: string;
+	website?: string; // honeypot
 };
 
 const INITIAL_FORM_STATE: ContactFormState = {
@@ -18,7 +24,8 @@ const INITIAL_FORM_STATE: ContactFormState = {
 	email: '',
 	phone: '',
 	projectType: 'consultation',
-	message: ''
+	message: '',
+	website: ''
 };
 
 const projectOptions = [
@@ -33,14 +40,14 @@ const contactInfo = [
 	{
 		icon: <Phone className="h-5 w-5" />,
 		label: 'Call us (Ghana)',
-		value: '(+233) 55 805 6649',
-		href: 'tel:+233558056649'
+		value: CONTACTS.GHANA.display,
+		href: CONTACTS.GHANA.telHref
 	},
 	{
 		icon: <Phone className="h-5 w-5" />,
 		label: 'Call us (USA)',
-		value: '(+1) 904-767-3657',
-		href: 'tel:+19047673657'
+		value: CONTACTS.US.display,
+		href: CONTACTS.US.telHref
 	},
 	{
 		icon: <Mail className="h-5 w-5" />,
@@ -56,56 +63,65 @@ const contactInfo = [
 ];
 
 const ContactUs: React.FC = () => {
-	const [formState, setFormState] = useState<ContactFormState>(INITIAL_FORM_STATE);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+	const schema = z.object({
+		fullName: z.string().min(1, 'Please enter your full name'),
+		email: z.string().email('Please enter a valid email address'),
+		phone: z.string().optional(),
+		projectType: z.string().min(1, 'Select a project type'),
+		message: z.string().min(10, 'Please tell us about your project (at least 10 characters)'),
+		website: z.string().optional().max(0)
+	});
+
+	const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormState>({
+		resolver: zodResolver(schema),
+		defaultValues: INITIAL_FORM_STATE,
+		reValidateMode: 'onSubmit'
+	});
 
 	useEffect(() => {
 		window.scrollTo(0, 0);
 	}, []);
 
-	const handleChange = (
-		event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-	) => {
-		const { name, value } = event.target;
-		setFormState(prev => ({ ...prev, [name]: value }));
-	};
-
-	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		if (isSubmitting) {
-			return;
-		}
-
+	const onSubmit = async (data: ContactFormState) => {
+		// Honeypot check: prevent spam
+		if (data.website && data.website.trim().length > 0) return;
+		if (isSubmitting) return;
 		setIsSubmitting(true);
 		setToast(null);
-
 		try {
-			const response = await fetch('https://formspree.io/f/mdkpeyvj', {
+			const response = await fetch('https://formspree.io/f/mvgjjvoz', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					Accept: 'application/json'
 				},
 				body: JSON.stringify({
-					fullName: formState.fullName,
-					email: formState.email,
-					phone: formState.phone,
-					projectType: formState.projectType,
-					message: formState.message
+					fullName: data.fullName,
+					email: data.email,
+					phone: data.phone,
+					projectType: data.projectType,
+					message: data.message
 				})
 			});
 
-			if (!response.ok) {
-				throw new Error('Failed to submit form');
-			}
-
+			if (!response.ok) throw new Error('Failed to submit');
 			setToast({ message: "Thank you! We'll respond within one working day.", type: 'success' });
-			setFormState(INITIAL_FORM_STATE);
-		} catch (error) {
+			reset();
+		} catch (err) {
 			setToast({ message: 'Something went wrong. Please try again.', type: 'error' });
 		} finally {
 			setIsSubmitting(false);
+		}
+	};
+
+	const onErrors = (errors: any) => {
+		// Focus first invalid element for accessibility
+		const firstKey = Object.keys(errors)[0];
+		if (firstKey) {
+			const el = document.querySelector(`[name="${firstKey}"]`) as HTMLElement | null;
+			if (el) el.focus();
 		}
 	};
 
@@ -120,13 +136,13 @@ const ContactUs: React.FC = () => {
 
 	return (
 		<Layout>
+			<Seo title="Contact Us" description="Contact Brytwin Homes to schedule a consultation or inquire about properties and construction services." image="/og/contact.jpg" />
 			{toast && (
 				<div
-					className={`fixed right-4 top-28 z-50 max-w-sm rounded-xl px-4 py-3 text-sm font-medium shadow-xl transition ${
-						toast.type === 'success'
-							? 'bg-emerald-600 text-white'
-							: 'bg-red-600 text-white'
-					}`}
+					className={`fixed right-4 top-28 z-50 max-w-sm rounded-xl px-4 py-3 text-sm font-medium shadow-xl transition ${toast.type === 'success'
+						? 'bg-emerald-600 text-white'
+						: 'bg-red-600 text-white'
+						}`}
 					role="status"
 					aria-live="polite"
 				>
@@ -157,29 +173,57 @@ const ContactUs: React.FC = () => {
 
 						<div className="flex shrink-0 flex-col gap-4">
 							<div className="flex items-center gap-4 rounded-3xl border border-white/15 bg-white/10 p-6 text-left backdrop-blur sm:w-72 sm:flex-col sm:text-center">
-								<img src={mrBright} alt="Mr Bright" className="h-16 w-16 rounded-full object-cover shadow-lg" />
+								<div className="relative flex-shrink-0 rounded-[20px] overflow-hidden border border-white/10 shadow-lg p-0">
+									<img src={mrBright} alt="Mr Bright" className="h-20 w-20 md:h-24 md:w-24 rounded-[20px] object-cover shadow-lg" />
+								</div>
 								<div className="space-y-1 text-sm">
 									<p className="font-semibold">Mr. Bright</p>
 									<p className="text-gray-300">CEO & Founder</p>
-									<a
-										href="tel:+233558056649"
-										className="text-emerald-200 underline decoration-emerald-400/60 decoration-2 underline-offset-2 hover:text-emerald-100"
-									>
-										(+233) 55 805 6649
-									</a>
+									<div className="mt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
+										<a
+											href={CONTACTS.GHANA.telHref}
+											className="text-emerald-200 underline decoration-emerald-400/60 decoration-2 underline-offset-2 hover:text-emerald-100"
+										>
+											{CONTACTS.GHANA.display}
+										</a>
+										<a
+											href={CONTACTS.GHANA.waHref}
+											target="_blank"
+											rel="noreferrer"
+											aria-label="Message Mr. Bright on WhatsApp"
+											className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white hover:bg-emerald-700 transition-colors"
+										>
+											<MessageCircle className="h-4 w-4" />
+											WhatsApp
+										</a>
+									</div>
 								</div>
 							</div>
 							<div className="flex items-center gap-4 rounded-3xl border border-white/15 bg-white/10 p-6 text-left backdrop-blur sm:w-72 sm:flex-col sm:text-center">
-								<img src={msWin} alt="Dr Winifred" className="h-16 w-16 rounded-full object-cover shadow-lg" />
+								<div className="relative flex-shrink-0 rounded-[20px] overflow-hidden border border-white/10 shadow-lg p-0">
+									<img src={msWin} alt="Dr Winifred" className="h-20 w-20 md:h-24 md:w-24 rounded-[20px] object-cover shadow-lg" />
+								</div>
 								<div className="space-y-1 text-sm">
 									<p className="font-semibold">Dr. Winifred Danso Agyemang</p>
 									<p className="text-gray-300">Co-Founder & COO</p>
-									<a
-										href="tel:+19047673657"
-										className="text-red-200 underline decoration-red-300/70 decoration-2 underline-offset-2 hover:text-red-100"
-									>
-										(+1) 904-767-3657
-									</a>
+									<div className="mt-2 flex flex-col sm:flex-row items-center justify-center gap-2">
+										<a
+											href={CONTACTS.US.telHref}
+											className="text-red-200 underline decoration-red-300/70 decoration-2 underline-offset-2 hover:text-red-100"
+										>
+											{CONTACTS.US.display}
+										</a>
+										<a
+											href={CONTACTS.US.waHref}
+											target="_blank"
+											rel="noreferrer"
+											aria-label="Message Dr. Winifred on WhatsApp"
+											className="inline-flex items-center gap-2 rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white hover:bg-red-600 transition-colors"
+										>
+											<MessageCircle className="h-4 w-4" />
+											WhatsApp
+										</a>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -220,19 +264,20 @@ const ContactUs: React.FC = () => {
 							</div>
 						</div>
 
-						<form onSubmit={handleSubmit} className="space-y-6">
+						<form onSubmit={handleSubmit(onSubmit, onErrors)} className="space-y-6" noValidate>
 							<div className="grid gap-6 sm:grid-cols-2">
 								<label className="flex flex-col gap-2">
 									<span className="text-sm font-medium text-gray-700 dark:text-gray-300">Full name</span>
 									<input
 										name="fullName"
 										type="text"
-										required
-										value={formState.fullName}
-										onChange={handleChange}
+										aria-invalid={errors.fullName ? 'true' : 'false'}
+										aria-describedby={errors.fullName ? 'err-fullName' : undefined}
+										{...register('fullName')}
 										className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-red-400"
 										placeholder="Enter your full name"
 									/>
+									{errors.fullName && <div id="err-fullName" className="text-sm text-red-600 mt-1">{errors.fullName.message}</div>}
 								</label>
 
 								<label className="flex flex-col gap-2">
@@ -240,12 +285,13 @@ const ContactUs: React.FC = () => {
 									<input
 										name="email"
 										type="email"
-										required
-										value={formState.email}
-										onChange={handleChange}
+										aria-invalid={errors.email ? 'true' : 'false'}
+										aria-describedby={errors.email ? 'err-email' : undefined}
+										{...register('email')}
 										className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-red-400"
 										placeholder="name@example.com"
 									/>
+									{errors.email && <div id="err-email" className="text-sm text-red-600 mt-1">{errors.email.message}</div>}
 								</label>
 
 								<label className="flex flex-col gap-2">
@@ -253,19 +299,22 @@ const ContactUs: React.FC = () => {
 									<input
 										name="phone"
 										type="tel"
-										value={formState.phone}
-										onChange={handleChange}
+										aria-invalid={errors.phone ? 'true' : 'false'}
+										aria-describedby={errors.phone ? 'err-phone' : undefined}
+										{...register('phone')}
 										className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-red-400"
 										placeholder="Include country code e.g. +233"
 									/>
+									{errors.phone && <div id="err-phone" className="text-sm text-red-600 mt-1">{errors.phone.message}</div>}
 								</label>
 
 								<label className="flex flex-col gap-2">
 									<span className="text-sm font-medium text-gray-700 dark:text-gray-300">Project type</span>
 									<select
 										name="projectType"
-										value={formState.projectType}
-										onChange={handleChange}
+										aria-invalid={errors.projectType ? 'true' : 'false'}
+										aria-describedby={errors.projectType ? 'err-projectType' : undefined}
+										{...register('projectType')}
 										className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-red-400"
 									>
 										{projectOptions.map(option => (
@@ -274,6 +323,7 @@ const ContactUs: React.FC = () => {
 											</option>
 										))}
 									</select>
+									{errors.projectType && <div id="err-projectType" className="text-sm text-red-600 mt-1">{errors.projectType.message}</div>}
 								</label>
 							</div>
 
@@ -282,12 +332,16 @@ const ContactUs: React.FC = () => {
 								<textarea
 									name="message"
 									rows={6}
-									required
-									value={formState.message}
-									onChange={handleChange}
+									aria-invalid={errors.message ? 'true' : 'false'}
+									aria-describedby={errors.message ? 'err-message' : undefined}
+									{...register('message')}
 									className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 shadow-sm transition focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-red-400"
 									placeholder="Tell us about your project, budget, or timeline..."
 								/>
+								{errors.message && <div id="err-message" className="text-sm text-red-600 mt-1">{errors.message.message}</div>}
+
+								{/* Honeypot field */}
+								<input type="text" name="website" autoComplete="off" className="hidden" {...register('website')} />
 							</label>
 
 							<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -389,13 +443,13 @@ const ContactUs: React.FC = () => {
 							</p>
 							<div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
 								<a
-									href="tel:+233558056649"
+									href={CONTACTS.GHANA.telHref}
 									className="w-full rounded-full bg-red-600 px-6 py-3 text-center text-sm font-semibold text-white shadow-lg transition hover:bg-red-700 sm:w-auto"
 								>
 									Call Ghana Office
 								</a>
 								<a
-									href="tel:+19047673657"
+									href={CONTACTS.US.telHref}
 									className="w-full rounded-full border border-gray-300 px-6 py-3 text-center text-sm font-semibold text-gray-800 transition hover:border-red-500 hover:text-red-600 dark:border-gray-700 dark:text-gray-200 dark:hover:border-red-400 dark:hover:text-red-300 sm:w-auto"
 								>
 									Call US Office

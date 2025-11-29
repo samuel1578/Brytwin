@@ -16,11 +16,14 @@ import {
   Linkedin,
   ChevronDown
 } from 'lucide-react';
+// MessageCircle is used in ContactChooser component now
 import logo from '../logo.jpeg';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { useStaggeredInView } from '../hooks/useInView';
 import { useSwipeable } from 'react-swipeable';
 import BookingModal from '../components/BookingModal';
+import ContactChooser from '../components/ContactChooser';
+import { CONTACTS } from '../config/contacts';
 
 // Replace with a more professional corporate/architectural image
 
@@ -34,6 +37,10 @@ const AboutUs = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isBookingModalOpen, setIsBookingModalOpen] = React.useState(false);
   const [localToast, setLocalToast] = React.useState(null);
+  const [contactChooser, setContactChooser] = React.useState(null);
+
+  const openContactChooser = (label, telHref, waHref) => setContactChooser({ open: true, label, telHref, waHref });
+  const closeContactChooser = () => setContactChooser(null);
   const navigate = useNavigate();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
@@ -408,8 +415,8 @@ const AboutUs = () => {
 
         {/* Mobile Navigation (full implementation copied from App.tsx) */}
         <div className={`fixed inset-0 z-[9999] lg:hidden transition-all duration-500 ease-in-out ${isMenuOpen
-            ? 'opacity-100 visible'
-            : 'opacity-0 invisible pointer-events-none'
+          ? 'opacity-100 visible'
+          : 'opacity-0 invisible pointer-events-none'
           }`}>
           {/* Backdrop */}
           <div
@@ -534,7 +541,7 @@ const AboutUs = () => {
                   <div className="space-y-3">
                     <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <Phone className="w-4 h-4 mr-3 text-red-600 dark:text-red-400" />
-                      <span className="text-sm">(+233) 55 805 6649</span>
+                      <span className="text-sm">{CONTACTS.GHANA.display}</span>
                     </div>
                     <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <Mail className="w-4 h-4 mr-3 text-red-600 dark:text-red-400" />
@@ -557,7 +564,7 @@ const AboutUs = () => {
                     <Instagram className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
                     <Linkedin className="w-5 h-5 text-gray-400 hover:text-red-600 dark:hover:text-red-400 cursor-pointer transition-colors" />
                   </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">© 2024 Brytwin Homes</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">© 2025 Brytwin Homes</p>
                 </div>
               </div>
             </div>
@@ -745,8 +752,8 @@ const AboutUs = () => {
                 <div
                   key={currentParagraph}
                   className={`story-paragraph ${storyParagraphs[currentParagraph].isIntro
-                      ? 'text-xl md:text-2xl font-medium'
-                      : 'text-lg md:text-xl'
+                    ? 'text-xl md:text-2xl font-medium'
+                    : 'text-lg md:text-xl'
                     } leading-relaxed tracking-wide text-gray-700 dark:text-gray-300`}
                 >
                   {storyParagraphs[currentParagraph].text}
@@ -760,8 +767,8 @@ const AboutUs = () => {
                     key={index}
                     onClick={() => setCurrentParagraph(index)}
                     className={`h-1 rounded-full transition-all duration-300 ${index === currentParagraph
-                        ? 'story-indicator active bg-red-600 dark:bg-red-500'
-                        : 'story-indicator w-4 bg-gray-300 dark:bg-gray-700'
+                      ? 'story-indicator active bg-red-600 dark:bg-red-500'
+                      : 'story-indicator w-4 bg-gray-300 dark:bg-gray-700'
                       }`}
                     aria-label={`Go to paragraph ${index + 1}`}
                   />
@@ -776,8 +783,8 @@ const AboutUs = () => {
                   key={index}
                   onClick={() => setCurrentParagraph(index)}
                   className={`w-full text-left p-4 rounded-lg transition-all duration-300 ${index === currentParagraph
-                      ? 'bg-red-600 text-white shadow-lg'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    ? 'bg-red-600 text-white shadow-lg'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                 >
                   <span className="block font-medium">
@@ -903,7 +910,21 @@ const AboutUs = () => {
               <div className="space-y-4">
                 <div className="flex items-center">
                   <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
-                  <span className="text-gray-400 dark:text-gray-500">(+233) 55 805 6649</span>
+                  <button
+                    className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors underline decoration-transparent hover:decoration-emerald-400"
+                    onClick={(e) => { e.preventDefault(); openContactChooser('Ghana Office', 'tel:+233558056649', 'https://wa.me/233558056649'); }}
+                  >
+                    (+233) 55 805 6649
+                  </button>
+                </div>
+                <div className="flex items-center">
+                  <Phone className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
+                  <button
+                    className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors underline decoration-transparent hover:decoration-emerald-400"
+                    onClick={(e) => { e.preventDefault(); openContactChooser('US Office', 'tel:+19047673657', 'https://wa.me/19047673657'); }}
+                  >
+                    (+1) 904 767 3657
+                  </button>
                 </div>
                 <div className="flex items-center">
                   <Mail className="w-5 h-5 text-red-600 dark:text-red-400 mr-3" />
@@ -935,11 +956,19 @@ const AboutUs = () => {
           {/* Copyright */}
           <div className="border-t border-gray-800 dark:border-gray-600 pt-8 text-center">
             <p className="text-gray-400 dark:text-gray-500 transition-colors duration-300">
-              © 2024 Brytwin Homes & Construction Limited. All rights reserved.
+              © 2025 Brytwin Homes & Construction Limited. All rights reserved.
             </p>
           </div>
         </div>
       </footer>
+
+      <ContactChooser
+        isOpen={!!contactChooser}
+        label={contactChooser?.label}
+        telHref={contactChooser?.telHref}
+        waHref={contactChooser?.waHref}
+        onClose={closeContactChooser}
+      />
 
       <BookingModal isOpen={isBookingModalOpen} onClose={() => setIsBookingModalOpen(false)} onSuccess={(msg) => { setLocalToast(msg || "Thanks — we'll respond within one working day."); setTimeout(() => setLocalToast(null), 3500); }} />
 

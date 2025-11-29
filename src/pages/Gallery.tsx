@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import Seo from '../components/Seo';
 import { Camera, MapPin, Sparkles, Phone, MessageCircle, X } from 'lucide-react';
 import Layout from '../components/Layout';
+import { CONTACTS } from '../config/contacts';
 import hero2 from '../hero2.jpg';
 import estate from '../estate.jpg';
 import construction from '../construction.jpg';
@@ -121,16 +123,16 @@ const Gallery: React.FC = () => {
 		{
 			name: 'Mr. Bright',
 			title: 'CEO & Founder',
-			phoneLabel: 'Call (+233) 55 805 6649',
-			phoneHref: 'tel:+233558056649',
-			whatsAppHref: 'https://wa.me/233558056649'
+			phoneLabel: `Call ${CONTACTS.GHANA.display}`,
+			phoneHref: CONTACTS.GHANA.telHref,
+			whatsAppHref: CONTACTS.GHANA.waHref
 		},
 		{
 			name: 'Dr. Winifred Danso Agyemang',
 			title: 'Co-Founder & COO',
-			phoneLabel: 'Call (+1) 904-767-3657',
-			phoneHref: 'tel:+19047673657',
-			whatsAppHref: 'https://wa.me/19047673657'
+			phoneLabel: `Call ${CONTACTS.US.display}`,
+			phoneHref: CONTACTS.US.telHref,
+			whatsAppHref: CONTACTS.US.waHref
 		}
 	];
 
@@ -139,6 +141,7 @@ const Gallery: React.FC = () => {
 
 	return (
 		<Layout>
+			<Seo title="Gallery" description="Explore a curated portfolio of Brytwin Homes projects and developments." image="/og/gallery.jpg" />
 			{isConsultationModalOpen && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 px-4 py-10 backdrop-blur-sm">
 					<div className="absolute inset-0 z-0" onClick={closeConsultationModal} />
@@ -249,11 +252,10 @@ const Gallery: React.FC = () => {
 										key={category}
 										type="button"
 										onClick={() => setActiveCategory(category)}
-										className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
-											isActive
-												? 'border-red-600 bg-red-600 text-white shadow-lg'
-												: 'border-gray-200 text-gray-700 hover:border-red-500 hover:text-red-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-red-400 dark:hover:text-red-300'
-										}`}
+										className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${isActive
+											? 'border-red-600 bg-red-600 text-white shadow-lg'
+											: 'border-gray-200 text-gray-700 hover:border-red-500 hover:text-red-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-red-400 dark:hover:text-red-300'
+											}`}
 									>
 										{category}
 									</button>
@@ -276,6 +278,7 @@ const Gallery: React.FC = () => {
 										<img
 											src={item.image}
 											alt={item.title}
+											loading="lazy"
 											className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
 										/>
 										<div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-80 transition group-hover:opacity-90" />
