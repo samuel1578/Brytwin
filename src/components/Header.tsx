@@ -86,9 +86,9 @@ const Header = () => {
 
               {/* Company Name */}
               <div className="flex flex-col">
-                <h1 className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
+                <span className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                   Brytwin Homes
-                </h1>
+                </span>
                 <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                   & Construction Limited
                 </p>
@@ -131,9 +131,16 @@ const Header = () => {
                   Services
                   <span className={underlineClasses('/services')}></span>
                 </a>
-                <a href="#properties" className="relative text-sm uppercase tracking-wide font-semibold text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors group">
+                <a
+                  href="/properties"
+                  onClick={e => {
+                    e.preventDefault();
+                    navigate('/properties');
+                  }}
+                  className={desktopLinkClasses('/properties')}
+                >
                   Properties
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-red-600 dark:bg-red-400 transform scale-x-0 group-hover:scale-x-100 transition-transform"></span>
+                  <span className={underlineClasses('/properties')}></span>
                 </a>
                 <a
                   href="/gallery"
@@ -206,9 +213,9 @@ const Header = () => {
                 />
 
                 <div className="flex flex-col">
-                  <h1 className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
+                  <span className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                     Brytwin Homes
-                  </h1>
+                  </span>
                   <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                     & Construction Limited
                   </p>
@@ -256,8 +263,12 @@ const Header = () => {
                     Services
                   </a>
                   <a
-                    href="#properties"
-                    onClick={toggleMenu}
+                    href="/properties"
+                    onClick={e => {
+                      e.preventDefault();
+                      toggleMenu();
+                      navigate('/properties');
+                    }}
                     className="flex items-center px-4 py-4 text-lg font-semibold text-gray-700 dark:text-gray-300 rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400"
                   >
                     <Home className="w-5 h-5 mr-4" />

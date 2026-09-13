@@ -141,7 +141,7 @@ const Gallery: React.FC = () => {
 
 	return (
 		<Layout>
-			<Seo title="Gallery" description="Explore a curated portfolio of Brytwin Homes projects and developments." image="/og/gallery.jpg" />
+			<Seo title="Gallery" description="Explore a curated portfolio of Brytwin Homes projects and developments." image="/og/brytwin-home.png" />
 			{isConsultationModalOpen && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/70 px-4 py-10 backdrop-blur-sm">
 					<div className="absolute inset-0 z-0" onClick={closeConsultationModal} />

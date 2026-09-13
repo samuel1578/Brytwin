@@ -69,7 +69,7 @@ const Footer = () => {
               <li><a href="#home" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Home</a></li>
               <li><a href="#about" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">About Us</a></li>
               <li><a href="#services" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Services</a></li>
-              <li><a href="#properties" className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
+              <li><a href="/properties" onClick={e => { e.preventDefault(); navigate('/properties'); }} className="text-gray-400 dark:text-gray-500 hover:text-white transition-colors">Properties</a></li>
               <li>
                 <a
                   href="/gallery"

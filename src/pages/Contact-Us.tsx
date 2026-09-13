@@ -136,7 +136,7 @@ const ContactUs: React.FC = () => {
 
 	return (
 		<Layout>
-			<Seo title="Contact Us" description="Contact Brytwin Homes to schedule a consultation or inquire about properties and construction services." image="/og/contact.jpg" />
+			<Seo title="Contact Us" description="Contact Brytwin Homes to schedule a consultation or inquire about properties and construction services." image="/og/brytwin-home.png" />
 			{toast && (
 				<div
 					className={`fixed right-4 top-28 z-50 max-w-sm rounded-xl px-4 py-3 text-sm font-medium shadow-xl transition ${toast.type === 'success'

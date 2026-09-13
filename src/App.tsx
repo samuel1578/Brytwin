@@ -344,7 +344,7 @@ function MainApp() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 relative transition-colors duration-300">
-      <Seo title="Home" description="Brytwin Homes - construction, property management and international negotiations" image="/og/home.jpg" />
+      <Seo title="Home" description="Brytwin Homes - construction, property management and international negotiations" image="/og/brytwin-home.png" />
 
       {/* Add custom animations */}
       <style>{`
@@ -659,9 +659,9 @@ function MainApp() {
 
               {/* Company Name */}
               <div className="flex flex-col">
-                <h1 className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
+                <span className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                   Brytwin Homes
-                </h1>
+                </span>
                 <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                   & Construction Limited
                 </p>
@@ -765,9 +765,9 @@ function MainApp() {
                 />
 
                 <div className="flex flex-col">
-                  <h1 className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
+                  <span className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                     Brytwin Homes
-                  </h1>
+                  </span>
                   <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                     & Construction Limited
                   </p>
@@ -927,10 +927,10 @@ function MainApp() {
         onMouseLeave={() => setIsPaused(false)}
       >
         <div className="text-center text-white max-w-4xl mx-auto px-4 animate-fade-in-up">
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-slide-up" style={{ animationDelay: '0.2s' }}>
             Building Excellence,<br />
             <span className="text-emerald-400">Negotiating Globally, Managing Estates</span>
-          </h2>
+          </h1>
           <p className="text-lg md:text-xl mb-8 text-gray-200 animate-slide-up" style={{ animationDelay: '0.4s' }}>
             Your trusted partner for General Construction Works, International Negotiations, and Estate Management & Sales
           </p>

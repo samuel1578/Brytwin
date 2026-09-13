@@ -289,9 +289,9 @@ const Properties: React.FC = () => {
 
               {/* Company Name */}
               <div className="flex flex-col">
-                <h1 className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
+                <span className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                   Brytwin Homes
-                </h1>
+                </span>
                 <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                   & Construction Limited
                 </p>
@@ -388,9 +388,9 @@ const Properties: React.FC = () => {
                 />
 
                 <div className="flex flex-col">
-                  <h1 className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
+                  <span className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                     Brytwin Homes
-                  </h1>
+                  </span>
                   <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                     & Construction Limited
                   </p>
@@ -538,7 +538,7 @@ const Properties: React.FC = () => {
         </div>
       </nav>
 
-      <Seo title="Properties" description="Browse our available properties and listings from Brytwin Homes." image="/og/properties.jpg" />
+      <Seo title="Properties" description="Browse our available properties and listings from Brytwin Homes." image="/og/brytwin-home.png" />
       {/* Placeholder Hero Section */}
       <section className="relative flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 pt-20 h-[50vh]">
         <div className="text-center text-gray-900 dark:text-white max-w-4xl mx-auto px-4 animate-fade-in-up">

@@ -253,9 +253,9 @@ const Services: React.FC = () => {
 
               {/* Company Name */}
               <div className="flex flex-col">
-                <h1 className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
+                <span className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                   Brytwin Homes
-                </h1>
+                </span>
                 <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                   & Construction Limited
                 </p>
@@ -359,9 +359,9 @@ const Services: React.FC = () => {
                 />
 
                 <div className="flex flex-col">
-                  <h1 className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
+                  <span className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                     Brytwin Homes
-                  </h1>
+                  </span>
                   <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                     & Construction Limited
                   </p>
@@ -505,7 +505,7 @@ const Services: React.FC = () => {
       </nav>
 
       {/* Placeholder Hero Section */}
-      <Seo title="Services" description="Comprehensive real estate, construction, and international negotiation services from Brytwin Homes" image="/og/services.jpg" />
+      <Seo title="Services" description="Comprehensive real estate, construction, and international negotiation services from Brytwin Homes" image="/og/brytwin-home.png" />
       <section className="relative flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 pt-20 h-[60vh] md:min-h-screen geo-grid">
         {/* SVG Architectural Lines */}
         <svg className="absolute inset-0 w-full h-full z-0 opacity-20 dark:opacity-30" viewBox="0 0 100 100" preserveAspectRatio="none">

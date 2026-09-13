@@ -184,7 +184,7 @@ const AboutUs: React.FC = () => {
   // local booking modal state managed here for page-specific interactions
   return (
     <div className="min-h-screen w-screen overflow-x-hidden bg-white dark:bg-gray-900 relative transition-colors duration-300">
-      <Seo title="About Us" description="Learn more about Brytwin Homes, our leadership, mission, and growth story" image="/og/about.jpg" />
+      <Seo title="About Us" description="Learn more about Brytwin Homes, our leadership, mission, and growth story" image="/og/brytwin-home.png" />
       {/* Add custom animations */}
       <style>{`
         /* import Tangerine font */
@@ -800,9 +800,9 @@ const AboutUs: React.FC = () => {
                 className="h-12 w-12 object-contain"
               />
               <div className="flex flex-col">
-                <h1 className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
+                <span className="text-3xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                   Brytwin Homes
-                </h1>
+                </span>
                 <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                   & Construction Limited
                 </p>
@@ -897,9 +897,9 @@ const AboutUs: React.FC = () => {
                 />
 
                 <div className="flex flex-col">
-                  <h1 className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
+                  <span className="text-2xl font-normal text-gray-900 dark:text-white leading-none font-hurricane transition-colors duration-300">
                     Brytwin Homes
-                  </h1>
+                  </span>
                   <p className="text-xs text-gray-600 dark:text-gray-400 font-medium tracking-wide uppercase transition-colors duration-300">
                     & Construction Limited
                   </p>

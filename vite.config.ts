@@ -21,4 +21,5 @@ export default defineConfig(async ({ mode }) => {
     optimizeDeps: {
       exclude: ['lucide-react'],
     },
-  }));
+  };
+});
