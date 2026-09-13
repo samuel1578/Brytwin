@@ -54,7 +54,7 @@ const BookingModal = ({ isOpen, onClose, onSuccess }: BookingModalProps) => {
     serviceType: z.string().min(1, 'Please select a service type'),
     datetime: z.string().optional(),
     project: z.string().min(10, 'Tell us about the project (at least 10 chars)'),
-    website: z.string().optional().max(0)
+    website: z.string().max(0).optional()
   });
 
   type BookingForm = {

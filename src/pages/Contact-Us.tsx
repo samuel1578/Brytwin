@@ -71,7 +71,7 @@ const ContactUs: React.FC = () => {
 		phone: z.string().optional(),
 		projectType: z.string().min(1, 'Select a project type'),
 		message: z.string().min(10, 'Please tell us about your project (at least 10 characters)'),
-		website: z.string().optional().max(0)
+		website: z.string().max(0).optional()
 	});
 
 	const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormState>({
