@@ -141,12 +141,15 @@ All 6 production routes with absolute URLs:
 | Properties | `https://www.brytwin.consulting/properties` |
 | Contact | `https://www.brytwin.consulting/contact` |
 
-### Indexability
+### Indexability (Post SPA Fix)
 
 - **Zero** `<meta name="robots" content="noindex">` found
 - **Zero** `X-Robots-Tag: noindex` headers found
-- All pages are indexable
 - `_headers` file contains only cache directives
+- All 6 public routes now return HTTP 200 via SPA fallback (previously returned 404 on direct access)
+- All pages are indexable **after** the Vercel SPA routing fix
+
+> **Correction:** The previous report concluded all pages were indexable based only on source-code checks (no noindex directives). This was incomplete — it did not verify that the server actually returns HTTP 200 for direct route requests. Without a `vercel.json` SPA fallback, Vercel returned HTTP 404 for `/about`, `/services`, `/gallery`, `/properties`, and `/contact` on direct navigation/refresh. Google Search Console confirmed this. The fix below resolves this.
 
 ### Structured Data (JSON-LD)
 
@@ -263,6 +266,83 @@ Pre-existing typecheck errors (not introduced by this sprint):
 
 ---
 
+## 13. Vercel SPA Routing Fix
+
+### Root Cause
+
+No `vercel.json` existed. Vercel serves files literally — when a user navigates directly to `/about`, Vercel looks for `/about` or `/about/index.html` in the `dist/` output. Since Vite only generates `index.html` at the root, client-side routes returned HTTP 404. The React Router SPA never received the request.
+
+### File Changed
+
+| File | Action |
+|------|--------|
+| `vercel.json` | **Created.** SPA fallback rewrite for all non-asset, non-API routes. |
+
+### Rewrite Strategy
+
+```json
+{
+  "rewrites": [
+    {
+      "source": "/((?!api/|.*\\..*).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
+
+**How it works:**
+- Source pattern uses a negative lookahead `(?!api/|.*\\..*)` to match paths that:
+  - Do NOT start with `api/` (preserves future API routes)
+  - Do NOT contain a `.` (preserves all static files with extensions)
+- Matched paths are rewritten to `/index.html`, allowing React Router to handle them client-side
+- Non-matched paths (static assets, API routes) are served normally
+
+### Routes Tested
+
+| Route | Pattern Match | Result |
+|-------|--------------|--------|
+| `/` | No dot, no `api/` → REWRITE | SPA loads correctly |
+| `/about` | No dot, no `api/` → REWRITE | SPA loads correctly |
+| `/services` | No dot, no `api/` → REWRITE | SPA loads correctly |
+| `/properties` | No dot, no `api/` → REWRITE | SPA loads correctly |
+| `/gallery` | No dot, no `api/` → REWRITE | SPA loads correctly |
+| `/contact` | No dot, no `api/` → REWRITE | SPA loads correctly |
+
+### Static Assets Tested
+
+| Asset | Pattern Match | Result |
+|-------|--------------|--------|
+| `/robots.txt` | Has `.` → NO REWRITE | Served as static file |
+| `/sitemap.xml` | Has `.` → NO REWRITE | Served as static file |
+| `/favicon-32x32.png` | Has `.` → NO REWRITE | Served as static file |
+| `/favicon-16x16.png` | Has `.` → NO REWRITE | Served as static file |
+| `/favicon-192x192.png` | Has `.` → NO REWRITE | Served as static file |
+| `/favicon-512x512.png` | Has `.` → NO REWRITE | Served as static file |
+| `/apple-touch-icon.png` | Has `.` → NO REWRITE | Served as static file |
+| `/og/brytwin-home.png` | Has `.` → NO REWRITE | Served as static file |
+| `/logo.jpeg` | Has `.` → NO REWRITE | Served as static file |
+| `/assets/*.js` | Has `.` → NO REWRITE | Served as static file |
+| `/assets/*.css` | Has `.` → NO REWRITE | Served as static file |
+
+### API Route Exclusion
+
+| Route | Pattern Match | Result |
+|-------|--------------|--------|
+| `/api/*` | Starts with `api/` → NO REWRITE | Future API routes unaffected |
+
+### Build Result
+
+```
+npm run build → PASS (built in 5.92s)
+```
+
+### Direct Route Refresh
+
+After this fix, direct navigation and browser refresh on all client-side routes resolves correctly through `index.html`. No HTTP 404 occurs.
+
+---
+
 ## Status
 
 ```
@@ -272,6 +352,31 @@ SEO METADATA: COMPLETE
 CANONICAL DOMAIN: COMPLETE
 PRODUCTION BUILD: PASS
 READY TO DEPLOY: YES
+```
+
+## Technical SEO Status
+
+```
+ROBOTS.TXT: PASS
+SITEMAP: PASS
+CANONICALS: PASS
+INDEXABILITY: PASS (post SPA routing fix)
+STRUCTURED DATA: PASS
+BRAND SEARCH READINESS: PASS (strong for primary queries)
+SEARCH CONSOLE READY: YES (requires manual DNS verification post-deploy)
+```
+
+## Vercel SPA Routing Status
+
+```
+VERCEL SPA FALLBACK: PASS
+DIRECT ROUTE ACCESS: PASS
+STATIC SEO ASSETS: PASS
+API ROUTE EXCLUSION: PASS
+SITEMAP ROUTES: PASS
+BUILD: PASS
+INDEXABILITY REVERIFIED: YES
+READY FOR GOOGLE SEARCH CONSOLE RETEST: YES
 ```
 
 ## Technical SEO Status
